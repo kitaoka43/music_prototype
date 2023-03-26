@@ -42,8 +42,25 @@ class PostMusicRepository {
     return maps.last['id'];
   }
 
-  static Future<PostMusic?> getTarget() async {
+  // PostMusicを全件取得
+  static Future<List<PostMusic>> getPostMusic() async {
     final List<Map<String, dynamic>> maps = await database!.query(tableName);
+    if (maps.isEmpty) {
+      return List.empty();
+    } else {
+      List<PostMusic> targetList = List.generate(
+          maps.length,
+              (index) => PostMusic(
+            musicId: maps[index]['music_id'],
+            createdAt: DateTime.parse(maps[index]['created_at']),
+          ));
+      return targetList;
+    }
+  }
+
+  // Id指定でPostMusicを取得
+  static Future<PostMusic?> getPostMusicByMusicId(String musicId) async {
+    final List<Map<String, dynamic>> maps = await database!.query(tableName, where: "music_id=?", whereArgs: [musicId]);
     if (maps.isEmpty) {
       return null;
     } else {

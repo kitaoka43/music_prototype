@@ -23,7 +23,7 @@ class SwipeCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 image: DecorationImage(
-                  image: AssetImage(assetPath),
+                  image: NetworkImage(assetPath),
                   fit: BoxFit.cover,
                 ),
                 boxShadow: [
