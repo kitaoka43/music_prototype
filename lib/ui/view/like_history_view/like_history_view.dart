@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_prototype/ui/view/music_playing_view/music_playing_view.dart';
 
-// 消す
-const _images = [
-  'assets/image_5.jpg',
-  'assets/image_3.jpg',
-  'assets/image_4.jpg',
-];
 var selectedValue = "orange";
 final lists = <String>["orange", "apple", "strawberry", "banana", "grape"];
 

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_prototype/model/music/music_item.dart';
+import 'package:music_prototype/state/common/swipe_state.dart';
 
-class SwipeCard extends StatelessWidget {
+class SwipeCard extends ConsumerWidget {
   const SwipeCard({
-    required this.songTitle,
-    required this.artistName,
-    required this.assetPath,
+    required this.musicItem,
     super.key,
   });
 
-  final String songTitle;
-  final String artistName;
-  final String assetPath;
+  final MusicItem musicItem;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    MusicItem? currentMusicItem = ref.watch(currentMusicItemProvider);
+    double durationInSec = currentMusicItem == null ? 0 : currentMusicItem.durationInSec.toDouble() / 1000;
     return ClipRRect(
       child: Stack(
         children: [
@@ -23,7 +24,7 @@ class SwipeCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 image: DecorationImage(
-                  image: NetworkImage(assetPath),
+                  image: NetworkImage(musicItem.artworkUrl),
                   fit: BoxFit.cover,
                 ),
                 boxShadow: [
@@ -76,35 +77,57 @@ class SwipeCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 20),
                   child: Column(
                     children: [
-                      Text(
-                        songTitle,
-                        style: const TextStyle(
-                          color: Color(0xff474646),
-                          fontSize: 48,
-                          fontFamily: "Poppins",
-                          fontWeight: FontWeight.w700,
+                      FittedBox(
+                        child: Text(
+                          musicItem.musicName,
+                          style: const TextStyle(
+                            color: Color(0xff474646),
+                            fontSize: 48,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       const SizedBox(
-                        height: 25,
+                        height: 8,
                       ),
-                      Text(
-                        artistName,
-                        style: const TextStyle(
-                          color: Color(0xffffca03),
-                          fontSize: 40,
-                          fontFamily: "Poppins",
-                          fontWeight: FontWeight.w500,
+                      FittedBox(
+                        child: Text(
+                          musicItem.artistName,
+                          style: const TextStyle(
+                            color: Color(0xffffca03),
+                            fontSize: 28,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                      Slider(
-                        value: 0.5,
-                        onChanged: (value) {
-
-                        },
-                        activeColor: Colors.red,
-                        inactiveColor: Colors.grey.shade500,
-                      )
+                      Column(
+                        children: [
+                          Slider(
+                            value: ref.watch(playedSecondProvider) == 0 && durationInSec == 0
+                                ? 0
+                                : ref.watch(playedSecondProvider) / durationInSec <= 1
+                                    ? ref.watch(playedSecondProvider) / durationInSec
+                                    : 1,
+                            onChanged: (value) {
+                              return;
+                            },
+                            activeColor: Colors.black26,
+                            inactiveColor: Colors.grey.shade500,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("${(ref.watch(playedSecondProvider) / 60 ).toInt()}:${(ref.watch(playedSecondProvider) % 60).toInt().toString().padLeft(2, '0')}"),
+                                Text("-${((durationInSec - ref.watch(playedSecondProvider)) / 60).toInt()}:${((durationInSec - ref.watch(playedSecondProvider)) % 60).toInt().toString().padLeft(2, '0')}"),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 ),

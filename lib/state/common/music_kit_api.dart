@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_kit/music_kit.dart';
 
 final apiUriBase = Provider<String>((ref) {
   return "api.music.apple.com";
@@ -20,3 +21,6 @@ final developerTokenProvider = StateProvider<String>((ref) {
 final userTokenProvider = StateProvider<String>((ref) {
   return "userToken";
 });
+
+final musicKitProvider = StateProvider<MusicKit>((ref) => MusicKit());
+

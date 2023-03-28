@@ -4,18 +4,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_kit/music_kit.dart';
+import 'package:music_prototype/model/music/Genre.dart';
 import 'package:music_prototype/model/music/music_item.dart';
+import 'package:music_prototype/model/music_kit_api_arg/music_kit_api_arg.dart';
 import 'package:music_prototype/repository/musik_kit_api_repository/music_kit_api_repository.dart';
 import 'package:music_prototype/state/common/music_kit_api.dart';
+import 'package:music_prototype/state/common/swipe_state.dart';
 import 'package:music_prototype/ui/view/like_history_view/like_history_view.dart';
 import 'package:music_prototype/ui/view/music_swipe_view/component/card_overlay.dart';
 import 'package:music_prototype/ui/view/music_swipe_view/component/swipe_card.dart';
+import 'package:music_prototype/view_model/music_swipe_view_model/music_swipe_view_model.dart';
 import 'package:swipable_stack/swipable_stack.dart';
-
-// 消す
-var selectedValue = "orange";
-final lists = <String>["orange", "apple", "strawberry", "banana", "grape"];
-// 消す
 
 class MusicSwipeView extends ConsumerStatefulWidget {
   const MusicSwipeView({super.key});
@@ -26,10 +25,15 @@ class MusicSwipeView extends ConsumerStatefulWidget {
 
 class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTickerProviderStateMixin {
   late final SwipableStackController _controller;
-  late final AnimationController _animationController;
-  List<MusicItem> musicItemList = List.empty();
 
-  // MusicKit関連の変数
+  void _listenController() => setState(() {});
+  late final AnimationController _animationController;
+  bool isPlay = false;
+  Timer? timerd;
+  double allSecond = 0;
+  double second = 0;
+
+  // MusicKit関連の変数 --------------------------------------------------------------
   final _musicKitPlugin = MusicKit();
   MusicAuthorizationStatus _status = const MusicAuthorizationStatus.notDetermined();
   String _subsc = '';
@@ -44,20 +48,18 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
 
   MusicPlayerQueue? _playerQueue;
   late StreamSubscription<MusicPlayerQueue> _playerQueueStreamSubscription;
-  // MusicKit関連の変数
 
-  void _listenController() => setState(() {});
+  // MusicKit関連の変数 --------------------------------------------------------------
 
   @override
   void initState() {
     super.initState();
-    _controller = SwipableStackController()..addListener(_listenController);
-    _animationController = AnimationController(duration: Duration(microseconds: 500), vsync: this);
+    _controller = SwipableStackController();
+    _animationController = AnimationController(duration: const Duration(microseconds: 3000), vsync: this);
 
     //MusicKit関連
     initPlatformState();
     _musicKitPlugin.requestAuthorizationStatus();
-    // _musicKitPlugin.authorizationStatus.then((value) => print(value));
 
     _musicSubscriptionStreamSubscription = _musicKitPlugin.onSubscriptionUpdated.listen((event) {
       setState(() {
@@ -76,8 +78,6 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
         _playerQueue = event;
       });
     });
-
-    // musicItemList = MusicKitApiRepository
   }
 
   @override
@@ -91,6 +91,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
       ..dispose();
     _animationController.dispose();
   }
+
   Future<void> initPlatformState() async {
     final status = await _musicKitPlugin.authorizationStatus;
 
@@ -113,17 +114,24 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    // 画面の高さ・幅取得
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
+    // viewModelのインスタンス化
+    MusicSwipeViewModel vm = MusicSwipeViewModel();
+    vm.setRef(ref);
+
+    // ジャンルリスト
+    String developerToken = ref.watch(developerTokenProvider);
+    String userToken = ref.watch(userTokenProvider);
+    MusicKitApiArg arg = MusicKitApiArg(developerToken: developerToken, userToken: userToken, genre: 0);
+    final genreList = ref.watch(genreListProvider(arg));
+    final selectedGenre = ref.watch(selectedGenreProvider);
+
     Future(() async {
-      // print(_developerToken);
-      // Future.delayed(Duration(seconds: 10));
       ref.watch(developerTokenProvider.notifier).state = _developerToken!;
       ref.watch(userTokenProvider.notifier).state = _userToken;
-      
-      MusicKitApiRepository musicKitApiRepository = MusicKitApiRepository(ref: ref);
-      musicItemList = await musicKitApiRepository.getSongListData(18);
     });
 
     return Container(
@@ -161,122 +169,180 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
             )
           ],
         ),
-        body: Column(
-          children: [
-            // ElevatedButton(
-            //     onPressed: () {
-            //       initPlatformState();
-            //     },
-            //     child: Text("keke")),
-            Container(
-              width: MediaQuery.of(context).size.width / 2.3,
-              decoration: BoxDecoration(
-                  color: Colors.white, //background color of dropdown button
-                  borderRadius: BorderRadius.circular(15), //border raiuds of dropdown button
-                  boxShadow: const <BoxShadow>[
-                    //apply shadow on Dropdown button
-                    BoxShadow(
-                        color: Colors.black26, //shadow for button
-                        blurRadius: 5) //blur radius of shadow
-                  ]),
-              child: Padding(
-                padding: EdgeInsets.only(left: 30, right: 30),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: selectedValue,
-                    items: lists.map((String list) => DropdownMenuItem(value: list, child: Text(list))).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedValue = value!;
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(15),
-                    dropdownColor: Colors.white,
-                    elevation: 5,
-                    isExpanded: true,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 650,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Stack(children: [
-                      Center(child: const Text("アイテムがありません")),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: SwipableStack(
-                          detectableSwipeDirections: const {
-                            SwipeDirection.right,
-                            SwipeDirection.left,
-                          },
-                          controller: _controller,
-                          itemCount: musicItemList.length,
-                          stackClipBehaviour: Clip.none,
-                          onSwipeCompleted: (index, direction) {
-                            //スワイプ時の処理をここに記述する
-                          },
-                          horizontalSwipeThreshold: 0.8,
-                          verticalSwipeThreshold: 0.8,
-                          builder: (context, properties) {
-                            return Stack(
-                              children: [
-                                // スワイプカード
-                                SwipeCard(
-                                  songTitle: "Bad guy",
-                                  artistName: "Billie eilish",
-                                  assetPath: musicItemList[properties.index].artworkUrl,
-                                ),
-                                // オーバーレイ
-                                if (properties.stackIndex == 0 && properties.direction != null)
-                                  CardOverlay(
-                                    swipeProgress: properties.swipeProgress,
-                                    direction: properties.direction!,
-                                  )
-                              ],
-                            );
-                          },
+        body: Center(
+          child: genreList.when(
+              error: (err, _) => Text(err.toString()), //エラー時
+              loading: () => const CircularProgressIndicator(), //読み込み時
+              data: (genreListData) {
+                WidgetsBinding.instance.addPostFrameCallback((cb) async {
+                  if (ref.watch(selectedGenreProvider) == null) {
+                    ref.watch(selectedGenreProvider.notifier).state = genreListData[0];
+                  }
+                });
+                String developerToken = ref.watch(developerTokenProvider);
+                String userToken = ref.watch(userTokenProvider);
+                String genre;
+                if (ref.watch(selectedGenreProvider) != null) {
+                  genre = ref.watch(selectedGenreProvider)!.id;
+                } else {
+                  genre = genreListData[0].id;
+                }
+                MusicKitApiArg arg = MusicKitApiArg(developerToken: developerToken, userToken: userToken, genre: int.parse(genre));
+                final musicItemList = ref.watch(musicItemListProvider(arg));
+                // 曲取得
+
+                return Column(
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 1.5,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: const <BoxShadow>[BoxShadow(color: Colors.black26, blurRadius: 5)]),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: ref.watch(selectedGenreProvider)?.id,
+                            items: genreListData
+                                .map((genre) => DropdownMenuItem(value: genre.id, child: Text(genre.attributes["name"]!)))
+                                .toList(),
+                            onChanged: (String? value) {
+                              setState(() {
+                                for (Genre genre in genreListData) {
+                                  if (genre.id == value) {
+                                    ref.watch(selectedGenreProvider.notifier).state = genre;
+                                  }
+                                }
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(15),
+                            dropdownColor: Colors.white,
+                            elevation: 5,
+                            isExpanded: true,
+                          ),
                         ),
                       ),
-                    ]),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        floatingActionButton: Container(
-          width: 100,
-          height: 100,
-          padding: const EdgeInsets.only(bottom: 30),
-          child: FloatingActionButton(
-            onPressed: () {},
-            child: Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: FractionalOffset.topLeft,
-                  end: FractionalOffset.bottomRight,
-                  colors: [
-                    Colors.redAccent,
-                    Color(0xffe4a972),
+                    ),
+                    musicItemList.when(
+                        error: (err, _) => Text(err.toString()), //エラー時
+                        loading: () => const CircularProgressIndicator(), //読み込み時
+                        data: (musicItemListData) {
+                          if (musicItemListData.isEmpty) {
+                            return Container();
+                          }
+                          WidgetsBinding.instance.addPostFrameCallback((cb) async {
+                            if (ref.watch(currentMusicItemProvider) == null) {
+                              ref.watch(currentMusicItemProvider.notifier).state = musicItemListData[0];
+                            }
+                          });
+
+                          return SizedBox(
+                            height: 650,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Stack(children: [
+                                    const Center(child: Text("アイテムがありません")),
+                                    Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: SwipableStack(
+                                        detectableSwipeDirections: const {
+                                          SwipeDirection.right,
+                                          SwipeDirection.left,
+                                        },
+                                        controller: _controller,
+                                        itemCount: musicItemListData.length,
+                                        stackClipBehaviour: Clip.none,
+                                        onSwipeCompleted: (index, direction) {
+                                          //スワイプ時の処理
+                                          MusicItem musicItem = musicItemListData[index + 1];
+                                          // like
+                                          if (direction == SwipeDirection.right) {
+                                            vm.swipeLike(musicItem);
+                                          } else {
+                                            // bad
+                                            vm.swipeBad(musicItem);
+                                          }
+                                        },
+                                        horizontalSwipeThreshold: 0.8,
+                                        verticalSwipeThreshold: 0.8,
+                                        builder: (context, properties) {
+                                          return Stack(
+                                            children: [
+                                              // スワイプカード
+                                              SwipeCard(
+                                                musicItem: musicItemListData[properties.index],
+                                              ),
+                                              // オーバーレイ
+                                              if (properties.stackIndex == 0 && properties.direction != null)
+                                                CardOverlay(
+                                                  swipeProgress: properties.swipeProgress,
+                                                  direction: properties.direction!,
+                                                )
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ]),
+                                ),
+                              ],
+                            ),
+                          );
+                        }), //データ受け取り時
                   ],
+                );
+              } //データ受け取り時
+              ),
+        ),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 70,
+                height: 70,
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    timerd = Timer.periodic(const Duration(seconds: 1), (_) {
+                      // print("1秒毎に実行");
+                      _musicKitPlugin.playbackTime.then((value) {
+                        ref.watch(playedSecondProvider.notifier).state = value;
+                      });
+                    });
+                    if (isPlay == false){
+                      vm.musicPlay();
+                    } else {
+                      vm.musicStop();
+                    }
+                    setState(() {
+                      isPlay = !isPlay;
+                    });
+                  },
+                  child: Container(
+                    height: double.infinity,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: FractionalOffset.topLeft,
+                        end: FractionalOffset.bottomRight,
+                        colors: [
+                          Colors.redAccent,
+                          Color(0xffe4a972),
+                        ],
+                      ),
+                    ),
+                    child: Icon(
+                      isPlay ? Icons.pause : Icons.play_arrow,
+                      size: 40,
+                    ),
+                  ),
                 ),
               ),
-              child: AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  return Icon(
-                    _animationController.isAnimating ? Icons.pause : Icons.play_arrow,
-                    size: 40,
-                  );
-                },
-              ),
-            ),
+            ],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
