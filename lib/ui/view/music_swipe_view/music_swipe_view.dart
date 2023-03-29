@@ -174,11 +174,6 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
               error: (err, _) => Text(err.toString()), //エラー時
               loading: () => const CircularProgressIndicator(), //読み込み時
               data: (genreListData) {
-                WidgetsBinding.instance.addPostFrameCallback((cb) async {
-                  if (ref.watch(selectedGenreProvider) == null) {
-                    ref.watch(selectedGenreProvider.notifier).state = genreListData[0];
-                  }
-                });
                 String developerToken = ref.watch(developerTokenProvider);
                 String userToken = ref.watch(userTokenProvider);
                 String genre;
@@ -232,7 +227,10 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                             return Container();
                           }
                           WidgetsBinding.instance.addPostFrameCallback((cb) async {
-                            if (ref.watch(currentMusicItemProvider) == null) {
+                            if (ref.watch(selectedGenreProvider) == null || ref.watch(selectedGenreProvider)!.id == genreListData[0].id) {
+                              ref.watch(selectedGenreProvider.notifier).state = genreListData[0];
+                            }
+                            if (ref.watch(currentMusicItemProvider) == null || ref.watch(currentMusicItemProvider)!.id == musicItemListData[0].id) {
                               ref.watch(currentMusicItemProvider.notifier).state = musicItemListData[0];
                             }
                           });
@@ -312,7 +310,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                         ref.watch(playedSecondProvider.notifier).state = value;
                       });
                     });
-                    if (isPlay == false){
+                    if (isPlay == false) {
                       vm.musicPlay();
                     } else {
                       vm.musicStop();
