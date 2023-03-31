@@ -27,7 +27,7 @@ class LikeMusicRepository {
   //   }
   // }
 
-  static Future<int> insertTargetHistory(LikeMusic likeMusic) async {
+  static Future<int> insertLikeMusic(LikeMusic likeMusic) async {
     await database!.insert(tableName, {
       'music_id': likeMusic.musicId,
       'music_name': likeMusic.musicName,
@@ -40,10 +40,28 @@ class LikeMusicRepository {
     return maps.last['id'];
   }
 
-  static Future<List<LikeMusic>?> getLikeMusic() async {
+  static Future<List<LikeMusic>?> getLikeMusicList() async {
     final List<Map<String, dynamic>> maps = await database!.query(tableName);
     if (maps.isEmpty) {
       return null;
+    } else {
+      List<LikeMusic> likeMusicList = List.generate(
+          maps.length,
+              (index) => LikeMusic(
+            musicId: maps[index]['music_id'],
+            musicName: maps[index]['music_name'],
+            artistName: maps[index]['artist_name'],
+            genre: maps[index]['genre'],
+            artworkUrl: maps[index]['artwork_url'],
+            createdAt: DateTime.parse(maps[index]['created_at']),
+          ));
+      return likeMusicList;
+    }
+  }
+  static Future<List<LikeMusic>> getLikeMusicListByGenre(String genre) async {
+    final List<Map<String, dynamic>> maps = await database!.query(tableName, where: 'genre = ?', whereArgs: [genre]);
+    if (maps.isEmpty) {
+      return [];
     } else {
       List<LikeMusic> likeMusicList = List.generate(
           maps.length,

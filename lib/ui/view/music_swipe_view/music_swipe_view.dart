@@ -24,11 +24,10 @@ class MusicSwipeView extends ConsumerStatefulWidget {
 }
 
 class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTickerProviderStateMixin {
-  late final SwipableStackController _controller;
+  late final SwipableStackController _swipeController;
 
   void _listenController() => setState(() {});
   late final AnimationController _animationController;
-  bool isPlay = false;
   Timer? timerd;
   double allSecond = 0;
   double second = 0;
@@ -54,25 +53,28 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
   @override
   void initState() {
     super.initState();
-    _controller = SwipableStackController();
+    _swipeController = SwipableStackController();
     _animationController = AnimationController(duration: const Duration(microseconds: 3000), vsync: this);
 
     //MusicKit関連
     initPlatformState();
     _musicKitPlugin.requestAuthorizationStatus();
 
+    // サブスクリプションの監視
     _musicSubscriptionStreamSubscription = _musicKitPlugin.onSubscriptionUpdated.listen((event) {
       setState(() {
         _musicSubsciption = event;
       });
     });
 
+    // 曲のPlay状態の監視
     _playerStateStreamSubscription = _musicKitPlugin.onMusicPlayerStateChanged.listen((event) {
       setState(() {
         _playerState = event;
       });
     });
 
+    // 曲が変わったかどうかの監視
     _playerQueueStreamSubscription = _musicKitPlugin.onPlayerQueueChanged.listen((event) {
       setState(() {
         _playerQueue = event;
@@ -86,7 +88,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
     _musicSubscriptionStreamSubscription.cancel();
     _playerStateStreamSubscription.cancel();
     _playerQueueStreamSubscription.cancel();
-    _controller
+    _swipeController
       ..removeListener(_listenController)
       ..dispose();
     _animationController.dispose();
@@ -182,9 +184,9 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                 } else {
                   genre = genreListData[0].id;
                 }
+                // 曲取得
                 MusicKitApiArg arg = MusicKitApiArg(developerToken: developerToken, userToken: userToken, genre: int.parse(genre));
                 final musicItemList = ref.watch(musicItemListProvider(arg));
-                // 曲取得
 
                 return Column(
                   children: [
@@ -200,12 +202,16 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                           child: DropdownButton<String>(
                             value: ref.watch(selectedGenreProvider)?.id,
                             items: genreListData
-                                .map((genre) => DropdownMenuItem(value: genre.id, child: Text(genre.attributes["name"]!)))
+                                .map((genre) => DropdownMenuItem(value: genre.id, child: Center(child: Text(genre.attributes["name"]!))))
                                 .toList(),
                             onChanged: (String? value) {
+                              MusicKitApiArg newArg = arg.copyWith(genre: int.parse(value ?? "0"));
+                              ref.refresh(musicItemListProvider(newArg));
                               setState(() {
+                                // ジャンルの選択処理
                                 for (Genre genre in genreListData) {
                                   if (genre.id == value) {
+                                    ref.watch(beforeSelectedGenreProvider.notifier).state = ref.watch(selectedGenreProvider);
                                     ref.watch(selectedGenreProvider.notifier).state = genre;
                                   }
                                 }
@@ -220,18 +226,40 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                       ),
                     ),
                     musicItemList.when(
-                        error: (err, _) => Text(err.toString()), //エラー時
-                        loading: () => const CircularProgressIndicator(), //読み込み時
+                        error: (err, _) => const Text("ネットワークエラーのため、アプリを再起動してください。"), //エラー時
+                        loading: () => Center(
+                                child: Column(
+                              children: const [
+                                SizedBox(
+                                  height: 250,
+                                ),
+                                CircularProgressIndicator(),
+                              ],
+                            )), //読み込み時
                         data: (musicItemListData) {
                           if (musicItemListData.isEmpty) {
                             return Container();
                           }
+
+                          // ビルド後の処理
                           WidgetsBinding.instance.addPostFrameCallback((cb) async {
+                            // 初期表示の場合、ジャンルの一番上を選択
                             if (ref.watch(selectedGenreProvider) == null || ref.watch(selectedGenreProvider)!.id == genreListData[0].id) {
                               ref.watch(selectedGenreProvider.notifier).state = genreListData[0];
                             }
-                            if (ref.watch(currentMusicItemProvider) == null || ref.watch(currentMusicItemProvider)!.id == musicItemListData[0].id) {
+                            // 初期表示の場合、最初の曲を設定する
+                            if (ref.watch(currentMusicItemProvider) == null ||
+                                ref.watch(currentMusicItemProvider)!.id == musicItemListData[0].id) {
+                              //最初の曲を設定する
                               ref.watch(currentMusicItemProvider.notifier).state = musicItemListData[0];
+
+                            } else if (ref.watch(beforeSelectedGenreProvider)?.id != ref.watch(selectedGenreProvider)?.id) {
+                              // ジャンルが変更されていた場合、indexを初期化
+                              _swipeController.currentIndex = 0;
+                              ref.watch(beforeSelectedGenreProvider.notifier).state = ref.watch(selectedGenreProvider);
+                              // ジャンルが再選択された場合、曲を流し直す
+                              ref.watch(currentMusicItemProvider.notifier).state = musicItemListData[0];
+                              vm.musicPlay(_musicKitPlugin);
                             }
                           });
 
@@ -249,18 +277,22 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                                           SwipeDirection.right,
                                           SwipeDirection.left,
                                         },
-                                        controller: _controller,
+                                        controller: _swipeController,
                                         itemCount: musicItemListData.length,
                                         stackClipBehaviour: Clip.none,
                                         onSwipeCompleted: (index, direction) {
                                           //スワイプ時の処理
-                                          MusicItem musicItem = musicItemListData[index + 1];
+                                          MusicItem musicItem = musicItemListData[index];
+                                          MusicItem nextMusicItem = musicItemListData[index + 1];
                                           // like
                                           if (direction == SwipeDirection.right) {
-                                            vm.swipeLike(musicItem);
+                                            // like時の処理を行い、次の曲を流す
+                                            vm.swipeLike(musicItem, nextMusicItem);
+                                            vm.musicPlay(_musicKitPlugin);
                                           } else {
-                                            // bad
-                                            vm.swipeBad(musicItem);
+                                            // bad時の処理を行い、次の曲を流す
+                                            vm.swipeBad(musicItem, nextMusicItem);
+                                            vm.musicPlay(_musicKitPlugin);
                                           }
                                         },
                                         horizontalSwipeThreshold: 0.8,
@@ -310,14 +342,11 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                         ref.watch(playedSecondProvider.notifier).state = value;
                       });
                     });
-                    if (isPlay == false) {
-                      vm.musicPlay();
+                    if (_playerState == null || vm.isStop(_playerState!.playbackStatus)) {
+                      vm.musicPlay(_musicKitPlugin);
                     } else {
-                      vm.musicStop();
+                      vm.musicStop(_musicKitPlugin);
                     }
-                    setState(() {
-                      isPlay = !isPlay;
-                    });
                   },
                   child: Container(
                     height: double.infinity,
@@ -334,7 +363,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                       ),
                     ),
                     child: Icon(
-                      isPlay ? Icons.pause : Icons.play_arrow,
+                      _playerState == null || vm.isStop(_playerState!.playbackStatus) ? Icons.play_arrow : Icons.pause,
                       size: 40,
                     ),
                   ),
