@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_kit/music_kit.dart';
 import 'package:music_prototype/model/like_music/like_music.dart';
-import 'package:music_prototype/model/music/Genre.dart';
+import 'package:music_prototype/model/music/genre.dart';
 import 'package:music_prototype/model/music/music_item.dart';
 import 'package:music_prototype/model/post_music/post_music.dart';
 import 'package:music_prototype/repository/like_music_repository/like_music_repository.dart';
@@ -9,6 +9,7 @@ import 'package:music_prototype/repository/musik_kit_api_repository/music_kit_ap
 import 'package:music_prototype/repository/post_music_repository/post_music_repository.dart';
 import 'package:music_prototype/state/common/music_kit_api.dart';
 import 'package:music_prototype/state/common/swipe_state.dart';
+import 'package:music_prototype/state/like_music_state/like_music_state.dart';
 
 class MusicSwipeViewModel {
   late WidgetRef ref;
@@ -77,12 +78,16 @@ class MusicSwipeViewModel {
         musicName: musicItem.musicName,
         artistName: musicItem.artistName,
         genre: genre.id,
+        genreName: genre.attributes["name"] ?? "",
         artworkUrl: musicItem.artworkUrl,
         createdAt: DateTime.now());
+    LikeMusicRepository.insertLikeMusic(likeMusic);
 
     // PostMusicに保存
     PostMusic postMusic = PostMusic(musicId: musicItem.id, createdAt: DateTime.now());
     await PostMusicRepository.insertPostMusic(postMusic);
+
+    ref.refresh(likeMusicItemListProvider);
 
     return true;
   }

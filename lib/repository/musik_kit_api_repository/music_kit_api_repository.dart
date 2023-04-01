@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:async/async.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_prototype/model/music/Genre.dart';
+import 'package:music_prototype/model/music/genre.dart';
 import 'package:music_prototype/model/music/music_item.dart';
 import 'package:music_prototype/model/post_music/post_music.dart';
 import 'package:music_prototype/repository/post_music_repository/post_music_repository.dart';

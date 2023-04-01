@@ -2,7 +2,7 @@ class Genre {
   String id;
   Map<String, String> attributes;
 
-  Genre(this.id, this.attributes);
+  Genre(this.id,this.attributes);
 
   // Musicアイテム生成
   static List<Genre> createGenreList(List<dynamic> dataList) {

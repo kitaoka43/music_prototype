@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_prototype/model/music/Genre.dart';
+import 'package:music_prototype/model/music/genre.dart';
 import 'package:music_prototype/model/music/music_item.dart';
 import 'package:music_prototype/repository/musik_kit_api_repository/music_kit_api_repository.dart';
 import 'package:music_prototype/view_model/music_swipe_view_model/music_swipe_view_model.dart';

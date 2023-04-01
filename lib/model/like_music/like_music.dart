@@ -11,6 +11,7 @@ class LikeMusic with _$LikeMusic {
     required String musicName,
     required String artistName,
     required String genre,
+    required String genreName,
     required String artworkUrl,
     required DateTime createdAt,
   }) = _LikeMusic;

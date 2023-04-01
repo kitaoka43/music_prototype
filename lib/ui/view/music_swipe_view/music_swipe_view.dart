@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_kit/music_kit.dart';
-import 'package:music_prototype/model/music/Genre.dart';
+import 'package:music_prototype/model/music/genre.dart';
 import 'package:music_prototype/model/music/music_item.dart';
 import 'package:music_prototype/model/music_kit_api_arg/music_kit_api_arg.dart';
 import 'package:music_prototype/repository/musik_kit_api_repository/music_kit_api_repository.dart';
@@ -158,6 +158,8 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
               padding: EdgeInsets.symmetric(vertical: height / 105.5, horizontal: width / 48.75),
               child: InkWell(
                 onTap: () {
+                  // 音楽を止める
+                  _musicKitPlugin.stop();
                   Navigator.push(context, MaterialPageRoute(builder: (builder) => const LikeHistoryView()));
                 },
                 child: SizedBox(
@@ -226,7 +228,12 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                       ),
                     ),
                     musicItemList.when(
-                        error: (err, _) => const Text("ネットワークエラーのため、アプリを再起動してください。"), //エラー時
+                        error: (err, _) => const Center(
+                          child: Padding(
+                                padding: EdgeInsets.only(top: 250),
+                                child: Text("ネットワークエラーのため、アプリを再起動してください。"),
+                              ),
+                        ), //エラー時
                         loading: () => Center(
                                 child: Column(
                               children: const [
@@ -252,7 +259,6 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                                 ref.watch(currentMusicItemProvider)!.id == musicItemListData[0].id) {
                               //最初の曲を設定する
                               ref.watch(currentMusicItemProvider.notifier).state = musicItemListData[0];
-
                             } else if (ref.watch(beforeSelectedGenreProvider)?.id != ref.watch(selectedGenreProvider)?.id) {
                               // ジャンルが変更されていた場合、indexを初期化
                               _swipeController.currentIndex = 0;
