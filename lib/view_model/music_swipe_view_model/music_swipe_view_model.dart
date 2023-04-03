@@ -3,6 +3,7 @@ import 'package:music_kit/music_kit.dart';
 import 'package:music_prototype/model/like_music/like_music.dart';
 import 'package:music_prototype/model/music/genre.dart';
 import 'package:music_prototype/model/music/music_item.dart';
+import 'package:music_prototype/model/music_kit_api_arg/music_kit_api_arg.dart';
 import 'package:music_prototype/model/post_music/post_music.dart';
 import 'package:music_prototype/repository/like_music_repository/like_music_repository.dart';
 import 'package:music_prototype/repository/musik_kit_api_repository/music_kit_api_repository.dart';
@@ -21,16 +22,16 @@ class MusicSwipeViewModel {
   }
 
   // 曲再生
-  void musicPlay(MusicKit musicKit) async {
+  void musicPlay(MusicKit musicKit, MusicItem? musicItem) async {
     // 現在の曲を取得
-    MusicItem? musicItem = ref.watch(currentMusicItemProvider);
+    // MusicItem? bkItem = ref.read(currentMusicItemBKProvider);
     if (musicItem == null) {
       return;
     }
 
     // 曲を再生する
+    await musicKit.stop();
     await musicKit.setQueue("songs", item: musicItem.toItem());
-    await musicKit.prepareToPlay();
     await musicKit.play();
   }
 
@@ -51,11 +52,12 @@ class MusicSwipeViewModel {
   }
 
   //表示するための曲リスト取得
-  Future<List<MusicItem>> getMusic(int genre) async {
+  Future<bool> refreshMusic(Genre? genre) async {
     String developerToken = ref.watch(developerTokenProvider);
     String userToken = ref.watch(userTokenProvider);
-    MusicKitApiRepository musicKitApiRepository = MusicKitApiRepository();
-    return musicKitApiRepository.getSongListData(developerToken, userToken, genre);
+    MusicKitApiArg arg = MusicKitApiArg(developerToken: developerToken, userToken: userToken, genre: int.parse(genre!.id));
+    ref.refresh(musicItemListProvider(arg));
+    return true;
   }
 
   // ドロップダウンボックス取得
@@ -68,8 +70,7 @@ class MusicSwipeViewModel {
 
   //like時の処理
   Future<bool> swipeLike(MusicItem musicItem, MusicItem nextMusicItem) async {
-    // 次の曲を設定する
-    ref.watch(currentMusicItemProvider.notifier).state = nextMusicItem;
+
     Genre genre = ref.read(selectedGenreProvider)!;
 
     // LikeMusicテーブルに保存
@@ -95,7 +96,7 @@ class MusicSwipeViewModel {
   //bad時の処理
   Future<bool> swipeBad(MusicItem musicItem, MusicItem nextMusicItem) async {
     // 次の曲を設定する
-    ref.watch(currentMusicItemProvider.notifier).state = nextMusicItem;
+    // ref.watch(currentMusicItemProvider.notifier).state = nextMusicItem;
 
     // PostMusicに保存
     PostMusic postMusic = PostMusic(musicId: musicItem.id, createdAt: DateTime.now());

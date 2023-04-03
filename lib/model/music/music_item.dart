@@ -39,4 +39,9 @@ class MusicItem {
     result["attributes"] = attributes;
     return result;
   }
+
+  // Musicアイテム（再生時）変換
+  MusicItem copyWith(){
+    return MusicItem(id, type, attributes, durationInSec, artworkUrl, musicName, artistName);
+  }
 }

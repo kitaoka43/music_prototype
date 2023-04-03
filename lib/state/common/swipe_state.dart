@@ -32,3 +32,6 @@ final genreListProvider = FutureProvider.family<List<Genre>, MusicKitApiArg>((re
   MusicKitApiRepository musicKitApiRepository = MusicKitApiRepository();
   return musicKitApiRepository.getGenre(arg.developerToken, arg.userToken);
 });
+
+// 現在流れている音楽
+final currentMusicItemBKProvider = StateProvider<MusicItem?>((ref) => null);

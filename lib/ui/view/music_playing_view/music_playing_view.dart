@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_prototype/state/common/music_playing_state.dart';
 
-class MusicPlayingView extends StatelessWidget {
+class MusicPlayingView extends ConsumerWidget {
   const MusicPlayingView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final musicList = ref.watch(musicPlayingCurrentMusicItemListProvider);
+    final currentMusic = ref.watch(musicPlayingCurrentMusicItemProvider);
+    final currentIndex = ref.watch(musicPlayingCurrentMusicItemIndexProvider);
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.black),

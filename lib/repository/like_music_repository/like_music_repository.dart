@@ -62,8 +62,8 @@ class LikeMusicRepository {
     }
   }
   static Future<List<LikeMusic>> getLikeMusicListByGenre(String genre) async {
-    print("k" +genre);
-    final List<Map<String, dynamic>> maps = await database!.query(tableName, where: 'genre = ?', whereArgs: [genre]);
+    // print("k" +genre);
+    final List<Map<String, dynamic>> maps = await database!.query(tableName, where: 'genre = ?', whereArgs: [genre] ,orderBy: "created_at desc");
     if (maps.isEmpty) {
       return [];
     } else {
