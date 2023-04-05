@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_kit/music_kit.dart';
 import 'package:music_prototype/model/like_music/like_music.dart';
 import 'package:music_prototype/model/music/Genre.dart';
 import 'package:music_prototype/state/common/music_playing_state.dart';
-import 'package:music_prototype/state/common/swipe_state.dart';
 import 'package:music_prototype/state/like_music_state/like_music_state.dart';
 import 'package:music_prototype/ui/view/music_playing_view/music_playing_view.dart';
 
@@ -20,91 +18,6 @@ class LikeHistoryView extends ConsumerStatefulWidget {
 }
 
 class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTickerProviderStateMixin {
-  void _listenController() => setState(() {});
-  late final AnimationController _animationController;
-  Timer? timerd;
-  double allSecond = 0;
-  double second = 0;
-
-  // MusicKit関連の変数 --------------------------------------------------------------
-  final _musicKitPlugin = MusicKit();
-  MusicAuthorizationStatus _status = const MusicAuthorizationStatus.notDetermined();
-  String _subsc = '';
-  String? _developerToken = '';
-  String _userToken = '';
-
-  MusicSubscription _musicSubsciption = MusicSubscription();
-  late StreamSubscription<MusicSubscription> _musicSubscriptionStreamSubscription;
-
-  MusicPlayerState? _playerState;
-  late StreamSubscription<MusicPlayerState> _playerStateStreamSubscription;
-
-  MusicPlayerQueue? _playerQueue;
-  late StreamSubscription<MusicPlayerQueue> _playerQueueStreamSubscription;
-
-  // MusicKit関連の変数 --------------------------------------------------------------
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(duration: const Duration(microseconds: 3000), vsync: this);
-
-    //MusicKit関連
-    initPlatformState();
-    _musicKitPlugin.requestAuthorizationStatus();
-
-    // サブスクリプションの監視
-    _musicSubscriptionStreamSubscription = _musicKitPlugin.onSubscriptionUpdated.listen((event) {
-      setState(() {
-        _musicSubsciption = event;
-      });
-    });
-
-    // 曲のPlay状態の監視
-    _playerStateStreamSubscription = _musicKitPlugin.onMusicPlayerStateChanged.listen((event) {
-      setState(() {
-        _playerState = event;
-      });
-    });
-
-    // 曲が変わったかどうかの監視
-    _playerQueueStreamSubscription = _musicKitPlugin.onPlayerQueueChanged.listen((event) {
-      setState(() {
-        _playerQueue = event;
-
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _musicSubscriptionStreamSubscription.cancel();
-    _playerStateStreamSubscription.cancel();
-    _playerQueueStreamSubscription.cancel();
-    _animationController.dispose();
-  }
-
-  Future<void> initPlatformState() async {
-    final status = await _musicKitPlugin.authorizationStatus;
-
-    final developerToken = await _musicKitPlugin.requestDeveloperToken();
-    final userToken = await _musicKitPlugin.requestUserToken(developerToken);
-
-    final countryCode = await _musicKitPlugin.currentCountryCode;
-    final subs = await _musicSubsciption.canPlayCatalogContent;
-
-    if (!mounted) return;
-
-    setState(() {
-      _status = status;
-      _developerToken = developerToken;
-      _userToken = userToken;
-      // _countryCode = countryCode;
-      _subsc = subs.toString();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final genreList = ref.watch(likeGenreListProvider);
@@ -122,7 +35,10 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
           backgroundColor: Colors.transparent,
         ),
         body: SizedBox(
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -134,13 +50,20 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                     // 初期表示の場合
                     if (selectedLikeGenre == null || beforeSelectedLikeGenre == null) {
-                      ref.watch(selectedLikeGenreProvider.notifier).state = genreListData[0];
-                      ref.watch(beforeSelectedLikeGenreProvider.notifier).state = genreListData[0];
+                      ref
+                          .watch(selectedLikeGenreProvider.notifier)
+                          .state = genreListData[0];
+                      ref
+                          .watch(beforeSelectedLikeGenreProvider.notifier)
+                          .state = genreListData[0];
                       ref.refresh(likeMusicItemListProvider);
                     }
                   });
                   return Container(
-                    width: MediaQuery.of(context).size.width / 1.5,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width / 1.5,
                     decoration: BoxDecoration(
                         color: Colors.white, //background color of dropdown button
                         borderRadius: BorderRadius.circular(15), //border raiuds of dropdown button
@@ -162,8 +85,12 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                             // ジャンルの選択処理
                             for (Genre genre in genreListData) {
                               if (genre.id == value) {
-                                ref.watch(beforeSelectedLikeGenreProvider.notifier).state = selectedLikeGenre;
-                                ref.watch(selectedLikeGenreProvider.notifier).state = genre;
+                                ref
+                                    .watch(beforeSelectedLikeGenreProvider.notifier)
+                                    .state = selectedLikeGenre;
+                                ref
+                                    .watch(selectedLikeGenreProvider.notifier)
+                                    .state = genre;
                               }
                             }
                           },
@@ -187,74 +114,99 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                     return likeMusicListData.isEmpty
                         ? Container()
                         : SingleChildScrollView(
-                            child: SizedBox(
-                              height: 680,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // 情報を設定して、画面遷移
-                                      ref.watch(musicPlayingCurrentMusicItemListProvider.notifier).state = likeMusicListData;
-                                      ref.watch(musicPlayingCurrentMusicItemProvider.notifier).state = likeMusicListData[index];
-                                      ref.watch(musicPlayingCurrentMusicItemIndexProvider.notifier).state = index;
-                                      Navigator.push(context, MaterialPageRoute(builder: (builder) => const MusicPlayingView()));
-                                    },
-                                    child: SizedBox(
-                                      height: 85,
-                                      child: Column(
+                      child: SizedBox(
+                        height: 680,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                // 情報を設定して、画面遷移
+                                ref
+                                    .watch(musicPlayingCurrentMusicItemListProvider.notifier)
+                                    .state = likeMusicListData;
+                                ref
+                                    .watch(musicPlayingCurrentMusicItemProvider.notifier)
+                                    .state = likeMusicListData[index];
+                                ref
+                                    .watch(musicPlayingCurrentMusicItemIndexProvider.notifier)
+                                    .state = index;
+                                Navigator.push(context, MaterialPageRoute(builder: (builder) => const MusicPlayingView()));
+                              },
+                              child: SizedBox(
+                                height: 85,
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                SizedBox(
-                                                  height: 70,
-                                                  width: 70,
-                                                  child: DecoratedBox(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(14),
-                                                      image: DecorationImage(
-                                                        image: NetworkImage(likeMusicListData[index].artworkUrl),
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          offset: const Offset(0, 2),
-                                                          blurRadius: 26,
-                                                          color: Colors.black.withOpacity(0.08),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(likeMusicListData[index].musicName),
-                                                    Text(likeMusicListData[index].artistName),
-                                                  ],
-                                                ),
-                                                const Icon(Icons.more_vert)
-                                              ],
+                                      Row(
+                                      children: [
+                                      SizedBox(
+                                      height: 70,
+                                        width: 70,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(14),
+                                            image: DecorationImage(
+                                              image: NetworkImage(likeMusicListData[index].artworkUrl),
+                                              fit: BoxFit.cover,
                                             ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                offset: const Offset(0, 2),
+                                                blurRadius: 26,
+                                                color: Colors.black.withOpacity(0.08),
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(
-                                            height: 7,
-                                          ),
-                                          const Divider(
-                                            height: 1,
-                                          )
-                                        ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 20.0),
+                                        child: SizedBox(
+
+                                          width: 230,
+                                          child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                          Padding(
+                                          padding: const EdgeInsets.only(bottom: 8.0),
+                                          child: Text(likeMusicListData[index].musicName,
+                                            style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
+                                            overflow: TextOverflow.ellipsis,),
+                                        ),
+                                        Text(likeMusicListData[index].artistName,
+                                          style: const TextStyle(fontSize: 14, color: Colors.grey, overflow: TextOverflow.ellipsis,)),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  );
-                                },
-                                itemCount: likeMusicListData.length,
+                                  ],
+                                ),
+                                const Icon(Icons.more_vert)
+                                ],
                               ),
                             ),
-                          );
+                            const SizedBox(
+                            height: 7,
+                            ),
+                            const Divider(
+                            height: 1,
+                            )
+                            ],
+                            ),
+                            )
+                            ,
+                            );
+                          },
+                          itemCount: likeMusicListData.length,
+                        ),
+                      ),
+                    );
                   }),
             ],
           ),

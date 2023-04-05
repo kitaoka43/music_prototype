@@ -7,5 +7,5 @@ import 'package:music_prototype/model/music/music_item.dart';
 final musicPlayingCurrentMusicItemProvider = StateProvider<LikeMusic?>((ref) => null);
 final musicPlayingCurrentMusicItemIndexProvider = StateProvider<int>((ref) => 0);
 
-// 現在流れている音楽
+// 現在流れている音楽のリスト
 final musicPlayingCurrentMusicItemListProvider = StateProvider<List<LikeMusic>>((ref) => []);

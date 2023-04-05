@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:marquee/marquee.dart';
 import 'package:music_prototype/model/music/music_item.dart';
 import 'package:music_prototype/state/common/swipe_state.dart';
 
@@ -77,15 +78,25 @@ class SwipeCard extends ConsumerWidget {
                   padding: const EdgeInsets.only(top: 20),
                   child: Column(
                     children: [
-                      FittedBox(
-                        child: Text(
-                          musicItem.musicName,
+                      SizedBox(
+                        height: 50,
+                        child: musicItem.musicName.length <= 20 ?
+                        Text(musicItem.musicName,
                           style: const TextStyle(
                             color: Color(0xff474646),
-                            fontSize: 48,
+                            fontSize: 34,
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w700,
+                          ),)
+                        : Marquee(
+                          text: "${musicItem.musicName}         ",
+                          style: const TextStyle(
+                            color: Color(0xff474646),
+                            fontSize: 34,
                             fontFamily: "Poppins",
                             fontWeight: FontWeight.w700,
                           ),
+                          pauseAfterRound: const Duration(seconds: 2),
                         ),
                       ),
                       const SizedBox(
@@ -121,8 +132,10 @@ class SwipeCard extends ConsumerWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("${(ref.watch(playedSecondProvider) / 60 ).toInt()}:${(ref.watch(playedSecondProvider) % 60).toInt().toString().padLeft(2, '0')}"),
-                                Text("-${((durationInSec - ref.watch(playedSecondProvider)) / 60).toInt()}:${((durationInSec - ref.watch(playedSecondProvider)) % 60).toInt().toString().padLeft(2, '0')}"),
+                                Text(
+                                    "${(ref.watch(playedSecondProvider) / 60).toInt()}:${(ref.watch(playedSecondProvider) % 60).toInt().toString().padLeft(2, '0')}"),
+                                Text(
+                                    "-${((durationInSec - ref.watch(playedSecondProvider)) / 60).toInt()}:${((durationInSec - ref.watch(playedSecondProvider)) % 60).toInt().toString().padLeft(2, '0')}"),
                               ],
                             ),
                           )

@@ -1,3 +1,5 @@
+import 'package:music_prototype/model/like_music/like_music.dart';
+
 class MusicItem {
   String id;
   String type;
@@ -13,7 +15,6 @@ class MusicItem {
   static MusicItem createMusicItem(Map<String, dynamic> data){
     String id = data["id"];
     String type = data["type"];
-    // print(data["attributes"]["durationInMillis"] / 1000);
     int durationInSec = (data["attributes"]["durationInMillis"]).toInt();
     String artworkUrl = data["attributes"]["artwork"]["url"];
     if (artworkUrl.isNotEmpty){
@@ -33,6 +34,20 @@ class MusicItem {
     result["type"] = type;
     Map<String,dynamic> playParams = {};
     playParams["id"] = id;
+    playParams["kind"] = "song";
+    Map<String,dynamic> attributes = {};
+    attributes["playParams"] = playParams;
+    result["attributes"] = attributes;
+    return result;
+  }
+
+  // Musicアイテム（再生時）変換
+  static Map<String,dynamic> likeMusicToItem(LikeMusic likeMusic){
+    Map<String,dynamic> result = {};
+    result["id"] = likeMusic.musicId;
+    result["type"] = "songs";
+    Map<String,dynamic> playParams = {};
+    playParams["id"] = likeMusic.musicId;
     playParams["kind"] = "song";
     Map<String,dynamic> attributes = {};
     attributes["playParams"] = playParams;

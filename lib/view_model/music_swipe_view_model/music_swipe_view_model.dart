@@ -53,9 +53,12 @@ class MusicSwipeViewModel {
 
   //表示するための曲リスト取得
   Future<bool> refreshMusic(Genre? genre) async {
+    if (genre == null) {
+      return false;
+    }
     String developerToken = ref.watch(developerTokenProvider);
     String userToken = ref.watch(userTokenProvider);
-    MusicKitApiArg arg = MusicKitApiArg(developerToken: developerToken, userToken: userToken, genre: int.parse(genre!.id));
+    MusicKitApiArg arg = MusicKitApiArg(developerToken: developerToken, userToken: userToken, genre: int.parse(genre.id));
     ref.refresh(musicItemListProvider(arg));
     return true;
   }
