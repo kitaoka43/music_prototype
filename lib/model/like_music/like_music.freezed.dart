@@ -25,6 +25,7 @@ mixin _$LikeMusic {
   String get artistName => throw _privateConstructorUsedError;
   String get genre => throw _privateConstructorUsedError;
   String get genreName => throw _privateConstructorUsedError;
+  int get durationInSec => throw _privateConstructorUsedError;
   String get artworkUrl => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
@@ -45,6 +46,7 @@ abstract class $LikeMusicCopyWith<$Res> {
       String artistName,
       String genre,
       String genreName,
+      int durationInSec,
       String artworkUrl,
       DateTime createdAt});
 }
@@ -67,6 +69,7 @@ class _$LikeMusicCopyWithImpl<$Res, $Val extends LikeMusic>
     Object? artistName = null,
     Object? genre = null,
     Object? genreName = null,
+    Object? durationInSec = null,
     Object? artworkUrl = null,
     Object? createdAt = null,
   }) {
@@ -91,6 +94,10 @@ class _$LikeMusicCopyWithImpl<$Res, $Val extends LikeMusic>
           ? _value.genreName
           : genreName // ignore: cast_nullable_to_non_nullable
               as String,
+      durationInSec: null == durationInSec
+          ? _value.durationInSec
+          : durationInSec // ignore: cast_nullable_to_non_nullable
+              as int,
       artworkUrl: null == artworkUrl
           ? _value.artworkUrl
           : artworkUrl // ignore: cast_nullable_to_non_nullable
@@ -116,6 +123,7 @@ abstract class _$$_LikeMusicCopyWith<$Res> implements $LikeMusicCopyWith<$Res> {
       String artistName,
       String genre,
       String genreName,
+      int durationInSec,
       String artworkUrl,
       DateTime createdAt});
 }
@@ -136,6 +144,7 @@ class __$$_LikeMusicCopyWithImpl<$Res>
     Object? artistName = null,
     Object? genre = null,
     Object? genreName = null,
+    Object? durationInSec = null,
     Object? artworkUrl = null,
     Object? createdAt = null,
   }) {
@@ -160,6 +169,10 @@ class __$$_LikeMusicCopyWithImpl<$Res>
           ? _value.genreName
           : genreName // ignore: cast_nullable_to_non_nullable
               as String,
+      durationInSec: null == durationInSec
+          ? _value.durationInSec
+          : durationInSec // ignore: cast_nullable_to_non_nullable
+              as int,
       artworkUrl: null == artworkUrl
           ? _value.artworkUrl
           : artworkUrl // ignore: cast_nullable_to_non_nullable
@@ -181,6 +194,7 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
       required this.artistName,
       required this.genre,
       required this.genreName,
+      required this.durationInSec,
       required this.artworkUrl,
       required this.createdAt});
 
@@ -198,13 +212,15 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
   @override
   final String genreName;
   @override
+  final int durationInSec;
+  @override
   final String artworkUrl;
   @override
   final DateTime createdAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LikeMusic(musicId: $musicId, musicName: $musicName, artistName: $artistName, genre: $genre, genreName: $genreName, artworkUrl: $artworkUrl, createdAt: $createdAt)';
+    return 'LikeMusic(musicId: $musicId, musicName: $musicName, artistName: $artistName, genre: $genre, genreName: $genreName, durationInSec: $durationInSec, artworkUrl: $artworkUrl, createdAt: $createdAt)';
   }
 
   @override
@@ -217,6 +233,7 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
       ..add(DiagnosticsProperty('artistName', artistName))
       ..add(DiagnosticsProperty('genre', genre))
       ..add(DiagnosticsProperty('genreName', genreName))
+      ..add(DiagnosticsProperty('durationInSec', durationInSec))
       ..add(DiagnosticsProperty('artworkUrl', artworkUrl))
       ..add(DiagnosticsProperty('createdAt', createdAt));
   }
@@ -234,6 +251,8 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
             (identical(other.genre, genre) || other.genre == genre) &&
             (identical(other.genreName, genreName) ||
                 other.genreName == genreName) &&
+            (identical(other.durationInSec, durationInSec) ||
+                other.durationInSec == durationInSec) &&
             (identical(other.artworkUrl, artworkUrl) ||
                 other.artworkUrl == artworkUrl) &&
             (identical(other.createdAt, createdAt) ||
@@ -243,7 +262,7 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, musicId, musicName, artistName,
-      genre, genreName, artworkUrl, createdAt);
+      genre, genreName, durationInSec, artworkUrl, createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -266,6 +285,7 @@ abstract class _LikeMusic implements LikeMusic {
       required final String artistName,
       required final String genre,
       required final String genreName,
+      required final int durationInSec,
       required final String artworkUrl,
       required final DateTime createdAt}) = _$_LikeMusic;
 
@@ -282,6 +302,8 @@ abstract class _LikeMusic implements LikeMusic {
   String get genre;
   @override
   String get genreName;
+  @override
+  int get durationInSec;
   @override
   String get artworkUrl;
   @override

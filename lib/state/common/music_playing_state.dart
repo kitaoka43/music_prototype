@@ -9,3 +9,5 @@ final musicPlayingCurrentMusicItemIndexProvider = StateProvider<int>((ref) => 0)
 
 // 現在流れている音楽のリスト
 final musicPlayingCurrentMusicItemListProvider = StateProvider<List<LikeMusic>>((ref) => []);
+
+final playedSecondProvider = StateProvider<double>((ref) => 0);

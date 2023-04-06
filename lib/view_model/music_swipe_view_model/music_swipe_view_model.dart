@@ -84,6 +84,7 @@ class MusicSwipeViewModel {
         genre: genre.id,
         genreName: genre.attributes["name"] ?? "",
         artworkUrl: musicItem.artworkUrl,
+        durationInSec: musicItem.durationInSec,
         createdAt: DateTime.now());
     LikeMusicRepository.insertLikeMusic(likeMusic);
 
@@ -108,7 +109,7 @@ class MusicSwipeViewModel {
     return true;
   }
 
-  //bad時の処理
+  //再生時の判定　曲が止まってたらtrue
   bool isStop(MusicPlayerPlaybackStatus status) {
     if (status == MusicPlayerPlaybackStatus.paused ||
         status == MusicPlayerPlaybackStatus.stopped ||

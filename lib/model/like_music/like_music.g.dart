@@ -12,6 +12,7 @@ _$_LikeMusic _$$_LikeMusicFromJson(Map<String, dynamic> json) => _$_LikeMusic(
       artistName: json['artistName'] as String,
       genre: json['genre'] as String,
       genreName: json['genreName'] as String,
+      durationInSec: json['durationInSec'] as int,
       artworkUrl: json['artworkUrl'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
@@ -23,6 +24,7 @@ Map<String, dynamic> _$$_LikeMusicToJson(_$_LikeMusic instance) =>
       'artistName': instance.artistName,
       'genre': instance.genre,
       'genreName': instance.genreName,
+      'durationInSec': instance.durationInSec,
       'artworkUrl': instance.artworkUrl,
       'createdAt': instance.createdAt.toIso8601String(),
     };

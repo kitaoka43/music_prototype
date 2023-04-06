@@ -189,11 +189,33 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
-                            child: Slider(
-                              value: 0.5,
-                              onChanged: (value) {},
-                              activeColor: Colors.red,
-                              inactiveColor: Colors.grey.shade500,
+                            child: Column(
+                              children: [
+                                Slider(
+                                  value: currentMusic == null || currentMusic.durationInSec == 0
+                                      ? 0
+                                      : ref.watch(playedSecondProvider) / currentMusic.durationInSec / 1000 <= 1
+                                      ? ref.watch(playedSecondProvider) / currentMusic.durationInSec / 1000
+                                      : 1,
+                                  onChanged: (value) {
+                                    return;
+                                  },
+                                  activeColor: Colors.black26,
+                                  inactiveColor: Colors.grey.shade500,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          "${(ref.watch(playedSecondProvider) / 60).toInt()}:${(ref.watch(playedSecondProvider) % 60).toInt().toString().padLeft(2, '0')}"),
+                                      Text(
+                                          "-${(currentMusic!.durationInSec / 1000 - ref.watch(playedSecondProvider)) ~/ 60}:${((currentMusic.durationInSec / 1000 - ref.watch(playedSecondProvider)) % 60).toInt().toString().padLeft(2, '0')}"),
+                                    ],
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                           Row(
@@ -206,7 +228,7 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
-                                    await vm.nextMusicPlay();
+                                    await vm.backMusicPlay();
                                   },
                                   child: Icon(
                                     Icons.skip_previous,
@@ -220,7 +242,17 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 padding: const EdgeInsets.symmetric(horizontal: 30),
                                 child: GestureDetector(
                                   onTap: () async {
-                                    await vm.musicPlay();
+                                    timerd = Timer.periodic(const Duration(seconds: 1), (_) {
+                                      // print("1秒毎に実行");
+                                      _musicKitPlugin.playbackTime.then((value) {
+                                        ref.watch(playedSecondProvider.notifier).state = value;
+                                      });
+                                    });
+                                    if (_playerState == null || vm.isStop(_playerState!.playbackStatus)) {
+                                      await vm.musicPlay();
+                                    } else {
+                                      await vm.musicStop();
+                                    }
                                   },
                                   child: SizedBox(
                                     height: 70,
@@ -239,8 +271,8 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                           ],
                                         ),
                                       ),
-                                      child: const Icon(
-                                        true ? Icons.play_arrow : Icons.pause,
+                                      child: Icon(
+                                        _playerState == null || vm.isStop(_playerState!.playbackStatus) ? Icons.play_arrow : Icons.pause,
                                         size: 40,
                                         color: Colors.white,
                                       ),

@@ -28,14 +28,19 @@ class MusicPlayingViewModel {
     List<LikeMusic> musicList = ref.watch(musicPlayingCurrentMusicItemListProvider);
 
     // musicListの最後の曲の場合
-    if (musicList.isNotEmpty && musicList.length - 1 < currentIndex) {
+    if (musicList.isNotEmpty && musicList.length - 1 == currentIndex) {
       // 音楽を止めて、始めの曲をセットする
-      musicKit.setQueue("songs", item: musicList[0].toJson());
-      musicKit.prepareToPlay();
+      musicKit.setQueue("songs", item: MusicItem.likeMusicToItem(musicList[0]));
+      musicKit.stop();
       return false;
     }
 
-    await musicKit.setQueue("songs", item: musicList[currentIndex + 1].toJson());
+    // 曲を設定する
+    ref.watch(musicPlayingCurrentMusicItemProvider.notifier).state = musicList[currentIndex + 1];
+    ref.watch(musicPlayingCurrentMusicItemIndexProvider.notifier).state = currentIndex + 1;
+
+    //　曲を流す
+    await musicKit.setQueue("songs", item: MusicItem.likeMusicToItem(musicList[currentIndex + 1]));
     await musicKit.play();
     return true;
   }
@@ -45,12 +50,16 @@ class MusicPlayingViewModel {
     int currentIndex = ref.watch(musicPlayingCurrentMusicItemIndexProvider);
     List<LikeMusic> musicList = ref.watch(musicPlayingCurrentMusicItemListProvider);
 
-    // musicListの最後の曲の場合
+    // musicListの最初の曲の場合
     if (musicList.isNotEmpty && currentIndex == 0) {
       // 音楽を止める
-      musicKit.prepareToPlay();
+      print("object");
+      musicKit.stop();
       return false;
     }
+    // 曲を設定する
+    ref.watch(musicPlayingCurrentMusicItemProvider.notifier).state = musicList[currentIndex - 1];
+    ref.watch(musicPlayingCurrentMusicItemIndexProvider.notifier).state = currentIndex - 1;
 
     await musicKit.setQueue("songs", item: MusicItem.likeMusicToItem(musicList[currentIndex - 1]));
     await musicKit.play();
@@ -74,16 +83,25 @@ class MusicPlayingViewModel {
   }
 
   // 曲ストップ
-  Future<bool> musicStop(MusicKit musicKit) async {
+  Future<bool> musicStop() async {
     // 現在の曲を取得
     LikeMusic? currentMusic = ref.watch(musicPlayingCurrentMusicItemProvider);
 
     if (currentMusic == null) {
       return false;
     } else {
-      // 曲を再生する
+      // 曲を止める
       await musicKit.stop();
       return true;
     }
+  }
+  //再生時の判定　曲が止まってたらtrue
+  bool isStop(MusicPlayerPlaybackStatus status) {
+    if (status == MusicPlayerPlaybackStatus.paused ||
+        status == MusicPlayerPlaybackStatus.stopped ||
+        status == MusicPlayerPlaybackStatus.interrupted) {
+      return true;
+    }
+    return false;
   }
 }
