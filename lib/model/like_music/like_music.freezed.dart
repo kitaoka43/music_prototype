@@ -27,6 +27,7 @@ mixin _$LikeMusic {
   String get genreName => throw _privateConstructorUsedError;
   int get durationInSec => throw _privateConstructorUsedError;
   String get artworkUrl => throw _privateConstructorUsedError;
+  String get musicUrl => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,6 +49,7 @@ abstract class $LikeMusicCopyWith<$Res> {
       String genreName,
       int durationInSec,
       String artworkUrl,
+      String musicUrl,
       DateTime createdAt});
 }
 
@@ -71,6 +73,7 @@ class _$LikeMusicCopyWithImpl<$Res, $Val extends LikeMusic>
     Object? genreName = null,
     Object? durationInSec = null,
     Object? artworkUrl = null,
+    Object? musicUrl = null,
     Object? createdAt = null,
   }) {
     return _then(_value.copyWith(
@@ -102,6 +105,10 @@ class _$LikeMusicCopyWithImpl<$Res, $Val extends LikeMusic>
           ? _value.artworkUrl
           : artworkUrl // ignore: cast_nullable_to_non_nullable
               as String,
+      musicUrl: null == musicUrl
+          ? _value.musicUrl
+          : musicUrl // ignore: cast_nullable_to_non_nullable
+              as String,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -125,6 +132,7 @@ abstract class _$$_LikeMusicCopyWith<$Res> implements $LikeMusicCopyWith<$Res> {
       String genreName,
       int durationInSec,
       String artworkUrl,
+      String musicUrl,
       DateTime createdAt});
 }
 
@@ -146,6 +154,7 @@ class __$$_LikeMusicCopyWithImpl<$Res>
     Object? genreName = null,
     Object? durationInSec = null,
     Object? artworkUrl = null,
+    Object? musicUrl = null,
     Object? createdAt = null,
   }) {
     return _then(_$_LikeMusic(
@@ -177,6 +186,10 @@ class __$$_LikeMusicCopyWithImpl<$Res>
           ? _value.artworkUrl
           : artworkUrl // ignore: cast_nullable_to_non_nullable
               as String,
+      musicUrl: null == musicUrl
+          ? _value.musicUrl
+          : musicUrl // ignore: cast_nullable_to_non_nullable
+              as String,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -196,6 +209,7 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
       required this.genreName,
       required this.durationInSec,
       required this.artworkUrl,
+      required this.musicUrl,
       required this.createdAt});
 
   factory _$_LikeMusic.fromJson(Map<String, dynamic> json) =>
@@ -216,11 +230,13 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
   @override
   final String artworkUrl;
   @override
+  final String musicUrl;
+  @override
   final DateTime createdAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LikeMusic(musicId: $musicId, musicName: $musicName, artistName: $artistName, genre: $genre, genreName: $genreName, durationInSec: $durationInSec, artworkUrl: $artworkUrl, createdAt: $createdAt)';
+    return 'LikeMusic(musicId: $musicId, musicName: $musicName, artistName: $artistName, genre: $genre, genreName: $genreName, durationInSec: $durationInSec, artworkUrl: $artworkUrl, musicUrl: $musicUrl, createdAt: $createdAt)';
   }
 
   @override
@@ -235,6 +251,7 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
       ..add(DiagnosticsProperty('genreName', genreName))
       ..add(DiagnosticsProperty('durationInSec', durationInSec))
       ..add(DiagnosticsProperty('artworkUrl', artworkUrl))
+      ..add(DiagnosticsProperty('musicUrl', musicUrl))
       ..add(DiagnosticsProperty('createdAt', createdAt));
   }
 
@@ -255,6 +272,8 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
                 other.durationInSec == durationInSec) &&
             (identical(other.artworkUrl, artworkUrl) ||
                 other.artworkUrl == artworkUrl) &&
+            (identical(other.musicUrl, musicUrl) ||
+                other.musicUrl == musicUrl) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -262,7 +281,7 @@ class _$_LikeMusic with DiagnosticableTreeMixin implements _LikeMusic {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, musicId, musicName, artistName,
-      genre, genreName, durationInSec, artworkUrl, createdAt);
+      genre, genreName, durationInSec, artworkUrl, musicUrl, createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -287,6 +306,7 @@ abstract class _LikeMusic implements LikeMusic {
       required final String genreName,
       required final int durationInSec,
       required final String artworkUrl,
+      required final String musicUrl,
       required final DateTime createdAt}) = _$_LikeMusic;
 
   factory _LikeMusic.fromJson(Map<String, dynamic> json) =
@@ -306,6 +326,8 @@ abstract class _LikeMusic implements LikeMusic {
   int get durationInSec;
   @override
   String get artworkUrl;
+  @override
+  String get musicUrl;
   @override
   DateTime get createdAt;
   @override

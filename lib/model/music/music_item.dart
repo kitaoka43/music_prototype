@@ -6,10 +6,11 @@ class MusicItem {
   Map<String, Map<String, String>> attributes;
   int durationInSec;
   String artworkUrl;
+  String musicUrl;
   String musicName;
   String artistName;
 
-  MusicItem(this.id, this.type, this.attributes, this.durationInSec, this.artworkUrl, this.musicName, this.artistName);
+  MusicItem(this.id, this.type, this.attributes, this.durationInSec, this.artworkUrl, this.musicUrl, this.musicName, this.artistName);
 
   // Musicアイテム生成
   static MusicItem createMusicItem(Map<String, dynamic> data){
@@ -17,6 +18,7 @@ class MusicItem {
     String type = data["type"];
     int durationInSec = (data["attributes"]["durationInMillis"]).toInt();
     String artworkUrl = data["attributes"]["artwork"]["url"];
+    String musicUrl = data["attributes"]["url"];
     if (artworkUrl.isNotEmpty){
       artworkUrl = artworkUrl.replaceFirst("{w}", "1000").replaceFirst("{h}", "1000");
     }
@@ -24,7 +26,7 @@ class MusicItem {
     String artistName = data["attributes"]["artistName"];
     Map<String, String> playParams = {"id" : data["attributes"]["playParams"]["id"], "kind":  data["attributes"]["playParams"]["kind"]};
     Map<String, Map<String, String>> attributes = {"playParams":playParams};
-    MusicItem musicItem = MusicItem(id, type, attributes, durationInSec, artworkUrl, musicName, artistName);
+    MusicItem musicItem = MusicItem(id, type, attributes, durationInSec, artworkUrl, musicUrl, musicName, artistName);
     return musicItem;
   }
   // Musicアイテム（再生時）変換
@@ -57,6 +59,6 @@ class MusicItem {
 
   // Musicアイテム（再生時）変換
   MusicItem copyWith(){
-    return MusicItem(id, type, attributes, durationInSec, artworkUrl, musicName, artistName);
+    return MusicItem(id, type, attributes, durationInSec, artworkUrl, musicUrl, musicName, artistName);
   }
 }

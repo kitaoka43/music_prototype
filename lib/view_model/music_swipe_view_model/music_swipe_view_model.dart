@@ -22,7 +22,7 @@ class MusicSwipeViewModel {
   }
 
   // 曲再生
-  void musicPlay(MusicKit musicKit, MusicItem? musicItem) async {
+  Future<void> musicPlay(MusicKit musicKit, MusicItem? musicItem) async {
     // 現在の曲を取得
     // MusicItem? bkItem = ref.read(currentMusicItemBKProvider);
     if (musicItem == null) {
@@ -73,7 +73,6 @@ class MusicSwipeViewModel {
 
   //like時の処理
   Future<bool> swipeLike(MusicItem musicItem, MusicItem nextMusicItem) async {
-
     Genre genre = ref.read(selectedGenreProvider)!;
 
     // LikeMusicテーブルに保存
@@ -84,6 +83,7 @@ class MusicSwipeViewModel {
         genre: genre.id,
         genreName: genre.attributes["name"] ?? "",
         artworkUrl: musicItem.artworkUrl,
+        musicUrl: musicItem.musicUrl,
         durationInSec: musicItem.durationInSec,
         createdAt: DateTime.now());
     LikeMusicRepository.insertLikeMusic(likeMusic);
@@ -92,8 +92,9 @@ class MusicSwipeViewModel {
     PostMusic postMusic = PostMusic(musicId: musicItem.id, createdAt: DateTime.now());
     await PostMusicRepository.insertPostMusic(postMusic);
 
+    // 状態更新
     ref.refresh(likeMusicItemListProvider);
-
+    ref.refresh(likeGenreListProvider);
     return true;
   }
 
@@ -106,6 +107,9 @@ class MusicSwipeViewModel {
     PostMusic postMusic = PostMusic(musicId: musicItem.id, createdAt: DateTime.now());
     await PostMusicRepository.insertPostMusic(postMusic);
 
+    // 状態更新
+    ref.refresh(likeMusicItemListProvider);
+    ref.refresh(likeGenreListProvider);
     return true;
   }
 

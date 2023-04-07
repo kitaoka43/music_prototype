@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_kit/music_kit.dart';
 import 'package:music_prototype/model/like_music/like_music.dart';
 import 'package:music_prototype/model/music/Genre.dart';
 import 'package:music_prototype/state/common/music_playing_state.dart';
@@ -26,6 +27,8 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
     AsyncValue<List<LikeMusic>> musicItemList = ref.watch(likeMusicItemListProvider);
     return WillPopScope(
       onWillPop: () async {
+        MusicKit musicKit = MusicKit();
+        musicKit.stop();
         return true;
       },
       child: Scaffold(

@@ -11,7 +11,7 @@ class LikeMusicRepository {
 
   static Future<void> createTable(Database db, int version) async {
     await db.execute(
-        'create table $tableName(id integer PRIMARY KEY AUTOINCREMENT, music_id TEXT, music_name TEXT, artist_name TEXT, genre TEXT, genre_name TEXT, artwork_url TEXT, duration_in_sec integer, created_at TEXT)');
+        'create table $tableName(id integer PRIMARY KEY AUTOINCREMENT, music_id TEXT, music_name TEXT, artist_name TEXT, genre TEXT, genre_name TEXT, artwork_url TEXT, music_url TEXT, duration_in_sec integer, created_at TEXT)');
   }
 
   // static Future<Database> initDb() async {
@@ -36,6 +36,7 @@ class LikeMusicRepository {
       'genre': likeMusic.genre,
       'genre_name': likeMusic.genreName,
       'artwork_url': likeMusic.artworkUrl,
+      'music_url': likeMusic.musicUrl,
       'duration_in_sec': likeMusic.durationInSec,
       'created_at': DateTime.now().toString()
     });
@@ -57,6 +58,7 @@ class LikeMusicRepository {
             genre: maps[index]['genre'],
             genreName: maps[index]['genre_name'],
             artworkUrl: maps[index]['artwork_url'],
+            musicUrl: maps[index]['music_url'],
             durationInSec: maps[index]['duration_in_sec'],
             createdAt: DateTime.parse(maps[index]['created_at']),
           ));
@@ -78,6 +80,7 @@ class LikeMusicRepository {
             genre: maps[index]['genre'],
             genreName: maps[index]['genre_name'],
             artworkUrl: maps[index]['artwork_url'],
+            musicUrl: maps[index]['music_url'],
             durationInSec: maps[index]['duration_in_sec'],
             createdAt: DateTime.parse(maps[index]['created_at']),
           ));

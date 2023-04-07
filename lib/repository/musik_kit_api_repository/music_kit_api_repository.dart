@@ -46,8 +46,8 @@ class MusicKitApiRepository {
   }
 
   // 1曲取得
-  Future<MusicItem> getSongData(String developerToken, String userToken, int genre) async {
-    MusicItem result = MusicItem("id", "type", {}, 0, "artworkUrl", "musicName", "artistName");
+  Future<MusicItem?> getSongData(String developerToken, String userToken, int genre) async {
+    MusicItem? result;
     final AsyncMemoizer memoizer = AsyncMemoizer();
     await memoizer.runOnce(() async {
       // ヘッダーにdeveloperTokenとuserTokenを設定する
