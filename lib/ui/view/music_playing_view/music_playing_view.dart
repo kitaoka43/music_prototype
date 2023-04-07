@@ -19,6 +19,7 @@ class MusicPlayingView extends ConsumerStatefulWidget {
 class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with SingleTickerProviderStateMixin {
   void _listenController() => setState(() {});
   late final AnimationController _animationController;
+  bool playingFlag = false;
   Timer? timerd;
   double allSecond = 0;
   double second = 0;
@@ -108,6 +109,10 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
     final musicList = ref.watch(musicPlayingCurrentMusicItemListProvider);
     final currentMusic = ref.watch(musicPlayingCurrentMusicItemProvider);
     final currentIndex = ref.watch(musicPlayingCurrentMusicItemIndexProvider);
+    // 画面の高さ・幅取得
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
     return Stack(
       children: [
         Container(
@@ -228,7 +233,13 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
+                                    setState(() {
+                                      playingFlag = true;
+                                    });
                                     await vm.backMusicPlay();
+                                    setState(() {
+                                      playingFlag = false;
+                                    });
                                   },
                                   child: Icon(
                                     Icons.skip_previous,
@@ -242,6 +253,9 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 padding: const EdgeInsets.symmetric(horizontal: 30),
                                 child: GestureDetector(
                                   onTap: () async {
+                                    setState(() {
+                                      playingFlag = true;
+                                    });
                                     timerd = Timer.periodic(const Duration(seconds: 1), (_) {
                                       // print("1秒毎に実行");
                                       _musicKitPlugin.playbackTime.then((value) {
@@ -253,6 +267,9 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                     } else {
                                       await vm.musicStop();
                                     }
+                                    setState(() {
+                                      playingFlag = false;
+                                    });
                                   },
                                   child: SizedBox(
                                     height: 70,
@@ -287,7 +304,13 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
+                                    setState(() {
+                                      playingFlag = true;
+                                    });
                                     await vm.nextMusicPlay();
+                                    setState(() {
+                                      playingFlag = false;
+                                    });
                                   },
                                   child: Icon(
                                     Icons.skip_next,
@@ -306,7 +329,14 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
               ),
             ],
           ),
-        )
+        ),
+        if (playingFlag == true)
+          Container(
+            height: height,
+            width: width,
+            decoration: BoxDecoration(color: Colors.grey.shade200.withOpacity(0.4)),
+            child: const Center(child: CircularProgressIndicator()),
+          )
       ],
     );
   }

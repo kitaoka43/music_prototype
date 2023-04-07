@@ -51,5 +51,10 @@
     <string>Main</string>
     <key>NSLocalNetworkUsageDescription</key>
     <string>この部分に説明を記載してください。</string>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>sms</string>
+      <string>tel</string>
+    </array>
 </dict>
 </plist>

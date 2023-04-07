@@ -138,52 +138,50 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
       ref.watch(userTokenProvider.notifier).state = _userToken;
     });
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.blue.shade200,
-            Colors.blueAccent.shade700,
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          iconTheme: const IconThemeData(color: Colors.black),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          actions: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: height / 105.5, horizontal: width / 48.75),
-              child: InkWell(
-                onTap: () {
-                  // 音楽を止める
-                  _musicKitPlugin.stop();
-                  ref.refresh(likeMusicItemListProvider);
-                  ref.refresh(likeGenreListProvider);
-                  // リストを更新
-                  vm.refreshMusic(selectedGenre);
-                  _swipeController.currentIndex = 0;
+    return Stack(
+      children: [
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/haikei.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              iconTheme: const IconThemeData(color: Colors.black),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: height / 105.5, horizontal: width / 48.75),
+                  child: InkWell(
+                    onTap: () {
+                      // 音楽を止める
+                      _musicKitPlugin.stop();
+                      ref.refresh(likeMusicItemListProvider);
+                      ref.refresh(likeGenreListProvider);
+                      // リストを更新
+                      vm.refreshMusic(selectedGenre);
+                      _swipeController.currentIndex = 0;
 
-                  Navigator.push(context, MaterialPageRoute(builder: (builder) => const LikeHistoryView()));
-                },
-                child: SizedBox(
-                    height: height / 16.88,
-                    width: width / 7.8,
-                    child: const Icon(
-                      Icons.favorite_border,
-                      color: Colors.black,
-                    )),
-              ),
-            )
-          ],
-        ),
-        body: Stack(
-          children: [
-            Center(
+                      Navigator.push(context, MaterialPageRoute(builder: (builder) => const LikeHistoryView()));
+                    },
+                    child: SizedBox(
+                        height: height / 16.88,
+                        width: width / 7.8,
+                        child: const Icon(
+                          Icons.favorite_border,
+                          color: Colors.black,
+                        )),
+                  ),
+                )
+              ],
+            ),
+            body: Center(
               child: genreList.when(
                   error: (err, _) => Text(err.toString()), //エラー時
                   loading: () => const CircularProgressIndicator(), //読み込み時
@@ -214,7 +212,8 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                               child: DropdownButton<String>(
                                 value: ref.watch(selectedGenreProvider)?.id,
                                 items: genreListData
-                                    .map((genre) => DropdownMenuItem(value: genre.id, child: Center(child: Text(genre.attributes["name"]!))))
+                                    .map(
+                                        (genre) => DropdownMenuItem(value: genre.id, child: Center(child: Text(genre.attributes["name"]!))))
                                     .toList(),
                                 onChanged: (String? value) {
                                   MusicKitApiArg newArg = arg.copyWith(genre: int.parse(value ?? "0"));
@@ -297,7 +296,6 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                                             itemCount: musicItemListData.length,
                                             stackClipBehaviour: Clip.none,
                                             onSwipeCompleted: (index, direction) async {
-
                                               setState(() {
                                                 swipingFlag = true;
                                               });
@@ -350,57 +348,69 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                   } //データ受け取り時
                   ),
             ),
-            swipingFlag == true ? Container(height: height,width: width, color: Colors.transparent,): Container(),
-          ],
-        ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 70,
-                height: 70,
-                child: FloatingActionButton(
-                  onPressed: () async {
-                    timerd = Timer.periodic(const Duration(seconds: 1), (_) {
-                      // print("1秒毎に実行");
-                      _musicKitPlugin.playbackTime.then((value) {
-                        ref.watch(playedSecondProvider.notifier).state = value;
-                      });
-                    });
-                    if (_playerState == null || vm.isStop(_playerState!.playbackStatus)) {
-                      vm.musicPlay(_musicKitPlugin, ref.watch(currentMusicItemProvider));
-                    } else {
-                      vm.musicStop(_musicKitPlugin);
-                    }
-                  },
-                  child: Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: FractionalOffset.topLeft,
-                        end: FractionalOffset.bottomRight,
-                        colors: [
-                          Colors.redAccent,
-                          Color(0xffe4a972),
-                        ],
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 70,
+                    height: 70,
+                    child: FloatingActionButton(
+                      onPressed: () async {
+                        setState(() {
+                          swipingFlag = true;
+                        });
+                        timerd = Timer.periodic(const Duration(seconds: 1), (_) {
+                          // print("1秒毎に実行");
+                          _musicKitPlugin.playbackTime.then((value) {
+                            ref.watch(playedSecondProvider.notifier).state = value;
+                          });
+                        });
+                        if (_playerState == null || vm.isStop(_playerState!.playbackStatus)) {
+                          vm.musicPlay(_musicKitPlugin, ref.watch(currentMusicItemProvider));
+                        } else {
+                          vm.musicStop(_musicKitPlugin);
+                        }
+                        setState(() {
+                          swipingFlag = false;
+                        });
+                      },
+                      child: Container(
+                        height: double.infinity,
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            begin: FractionalOffset.topLeft,
+                            end: FractionalOffset.bottomRight,
+                            colors: [
+                              Colors.redAccent,
+                              Color(0xffe4a972),
+                            ],
+                          ),
+                        ),
+                        child: Icon(
+                          _playerState == null || vm.isStop(_playerState!.playbackStatus) ? Icons.play_arrow : Icons.pause,
+                          size: 40,
+                        ),
                       ),
                     ),
-                    child: Icon(
-                      _playerState == null || vm.isStop(_playerState!.playbackStatus) ? Icons.play_arrow : Icons.pause,
-                      size: 40,
-                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      ),
+        if (swipingFlag == true)
+          Container(
+            height: height,
+            width: width,
+            decoration: BoxDecoration(color: Colors.grey.shade200.withOpacity(0.4)),
+            child: const Center(child: CircularProgressIndicator()),
+          )
+      ],
     );
   }
 }
