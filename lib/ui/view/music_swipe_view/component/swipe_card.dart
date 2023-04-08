@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marquee/marquee.dart';
@@ -20,22 +23,57 @@ class SwipeCard extends ConsumerWidget {
     return ClipRRect(
       child: Stack(
         children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                image: DecorationImage(
-                  image: NetworkImage(musicItem.artworkUrl),
-                  fit: BoxFit.cover,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    offset: const Offset(0, 2),
-                    blurRadius: 26,
-                    color: Colors.black.withOpacity(0.08),
+          Blur(
+            blur: 2.5,
+            borderRadius: BorderRadius.circular(14),
+            child: Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  image: DecorationImage(
+                    image: NetworkImage(musicItem.artworkUrl),
+                    // image: NetworkImage(musicItem.artworkUrl),
+                    fit: BoxFit.cover,
                   ),
-                ],
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(0, 2),
+                      blurRadius: 26,
+                      color: Colors.black.withOpacity(0.08),
+                    ),
+                  ],
+                ),
               ),
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 40,
+                ),
+                Container(
+                  height: 310,
+                  width: 310,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    image: DecorationImage(
+                      image: NetworkImage(musicItem.artworkUrl),
+                      // image: NetworkImage(musicItem.artworkUrl),
+                      fit: BoxFit.cover,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: const Offset(0, 2),
+                        blurRadius: 26,
+                        color: Colors.black.withOpacity(0.08),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           Align(
@@ -80,39 +118,43 @@ class SwipeCard extends ConsumerWidget {
                     children: [
                       SizedBox(
                         height: 50,
-                        child: musicItem.musicName.length <= 20 ?
-                        Text(musicItem.musicName,
-                          style: const TextStyle(
-                            color: Color(0xff474646),
-                            fontSize: 34,
-                            fontFamily: "Poppins",
-                            fontWeight: FontWeight.w700,
-                          ),)
-                        : Marquee(
-                          text: "${musicItem.musicName}         ",
-                          style: const TextStyle(
-                            color: Color(0xff474646),
-                            fontSize: 34,
-                            fontFamily: "Poppins",
-                            fontWeight: FontWeight.w700,
-                          ),
-                          pauseAfterRound: const Duration(seconds: 2),
+                        child: musicItem.musicName.length <= 20
+                            ? Text(
+                                musicItem.musicName,
+                                style: const TextStyle(
+                                  color: Color(0xff474646),
+                                  fontSize: 34,
+                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            : Marquee(
+                                text: "${musicItem.musicName}         ",
+                                style: const TextStyle(
+                                  color: Color(0xff474646),
+                                  fontSize: 34,
+                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                pauseAfterRound: const Duration(seconds: 2),
+                          startAfter: const Duration(seconds: 2),
                         ),
                       ),
                       const SizedBox(
-                        height: 8,
+                        height: 5,
                       ),
                       FittedBox(
                         child: Text(
                           musicItem.artistName,
                           style: const TextStyle(
-                            color: Color(0xffffca03),
-                            fontSize: 28,
+                            color: Colors.black54,
+                            fontSize: 20,
                             fontFamily: "Poppins",
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
+                      SizedBox(height: 15,),
                       Column(
                         children: [
                           Slider(

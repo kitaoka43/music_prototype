@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marquee/marquee.dart';
 import 'package:music_kit/music_kit.dart';
 import 'package:music_prototype/state/common/music_playing_state.dart';
 import 'package:music_prototype/view_model/music_playing_view_model/music_playing_view_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MusicPlayingView extends ConsumerStatefulWidget {
   const MusicPlayingView({Key? key}) : super(key: key);
@@ -115,14 +117,48 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
 
     return Stack(
       children: [
-        Container(
-          height: double.infinity,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(currentMusic != null ? currentMusic.artworkUrl : ""),
-              fit: BoxFit.cover,
+        Blur(
+          blur: 2.5,
+          borderRadius: BorderRadius.circular(14),
+          child: Positioned.fill(
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(currentMusic != null ? currentMusic.artworkUrl : ""),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 120,),
+              Container(
+                height: 370,
+                width: 370,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  image: DecorationImage(
+                    image: NetworkImage(currentMusic != null ? currentMusic.artworkUrl : ""),
+                    // image: NetworkImage(musicItem.artworkUrl),
+                    fit: BoxFit.cover,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(0, 2),
+                      blurRadius: 26,
+                      color: Colors.black.withOpacity(0.08),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
         Scaffold(
@@ -131,7 +167,25 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
             iconTheme: const IconThemeData(color: Colors.black),
             elevation: 0,
             backgroundColor: Colors.transparent,
-            actions: const [SizedBox(width: 65, child: Icon(Icons.more_horiz))],
+            actions: [PopupMenuButton<String>(
+              initialValue: null,
+              onSelected: (String s) async {
+                final Uri url = Uri.parse(currentMusic != null ? currentMusic.musicUrl : "");
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(
+                    url,
+                  );
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return ["Apple Musicで探す"].map((String s) {
+                  return PopupMenuItem(
+                    value: s,
+                    child: Text(s),
+                  );
+                }).toList();
+              },
+            )],
           ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -159,13 +213,15 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                             height: 50,
                             child: currentMusic != null
                                 ? currentMusic.musicName.length <= 20
-                                    ? Text(
-                                      currentMusic.musicName,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 32,
-                                        fontFamily: "Poppins",
-                                        fontWeight: FontWeight.w700,
+                                    ? FittedBox(
+                                      child: Text(
+                                        currentMusic.musicName,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 32,
+                                          fontFamily: "Poppins",
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       ),
                                     )
                                     : Marquee(
@@ -177,19 +233,22 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                           fontWeight: FontWeight.w700,
                                         ),
                                         pauseAfterRound: const Duration(seconds: 2),
+                                        startAfter: const Duration(seconds: 2),
                                       )
                                 : Container(),
                           ),
                           const SizedBox(
                             height: 5,
                           ),
-                          Text(
-                            currentMusic != null ? currentMusic.artistName : "",
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 20,
-                              fontFamily: "Poppins",
-                              fontWeight: FontWeight.w500,
+                          FittedBox(
+                            child: Text(
+                              currentMusic != null ? currentMusic.artistName : "",
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 20,
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           Padding(
