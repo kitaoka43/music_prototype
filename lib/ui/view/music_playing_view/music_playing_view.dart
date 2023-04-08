@@ -88,7 +88,12 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
     final status = await _musicKitPlugin.authorizationStatus;
 
     final developerToken = await _musicKitPlugin.requestDeveloperToken();
-    final userToken = await _musicKitPlugin.requestUserToken(developerToken);
+    String userToken;
+    try {
+      userToken = await _musicKitPlugin.requestUserToken(developerToken);
+    } catch (e) {
+      userToken = "";
+    }
 
     final countryCode = await _musicKitPlugin.currentCountryCode;
     final subs = await _musicSubsciption.canPlayCatalogContent;
@@ -292,6 +297,9 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
+                                    if (_userToken.isEmpty){
+                                      return;
+                                    }
                                     setState(() {
                                       playingFlag = true;
                                     });
@@ -312,6 +320,9 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 padding: EdgeInsets.symmetric(horizontal: width / 13),
                                 child: GestureDetector(
                                   onTap: () async {
+                                    if (_userToken.isEmpty){
+                                      return;
+                                    }
                                     setState(() {
                                       playingFlag = true;
                                     });
@@ -363,6 +374,9 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
+                                    if (_userToken.isEmpty){
+                                      return;
+                                    }
                                     setState(() {
                                       playingFlag = true;
                                     });

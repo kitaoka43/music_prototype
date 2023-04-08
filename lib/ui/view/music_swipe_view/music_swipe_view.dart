@@ -103,20 +103,19 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
     print(subs);
 
     final developerToken = await _musicKitPlugin.requestDeveloperToken();
-    var userToken;
-    if (subs != null) {
+    String userToken;
+    try {
       userToken = await _musicKitPlugin.requestUserToken(developerToken);
+    } catch (e) {
+      userToken = "";
     }
-
     final countryCode = await _musicKitPlugin.currentCountryCode;
-    // final subs = _musicSubsciption.canPlayCatalogContent;
-
     if (!mounted) return;
 
     setState(() {
       _status = status;
       _developerToken = developerToken;
-      _userToken = userToken ?? "";
+      _userToken = userToken;
       // _countryCode = countryCode;
       _subsc = subs.toString();
     });
@@ -269,8 +268,10 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                                 _swipeController.currentIndex = 0;
                                 ref.watch(beforeSelectedGenreProvider.notifier).state = ref.watch(selectedGenreProvider);
                                 // ジャンルが再選択された場合、曲を流し直す
-                                vm.musicPlay(_musicKitPlugin, musicItemListData[0]);
                                 ref.watch(currentMusicItemProvider.notifier).state = musicItemListData[0];
+                                if (_userToken.isNotEmpty) {
+                                  await vm.musicPlay(_musicKitPlugin, musicItemListData[0]);
+                                }
                               }
                             });
 
@@ -303,11 +304,15 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                                             if (direction == SwipeDirection.right) {
                                               // like時の処理を行い、次の曲を流す
                                               result = await vm.swipeLike(musicItem, nextMusicItem);
-                                              await vm.musicPlay(_musicKitPlugin, nextMusicItem);
+                                              if (_userToken.isNotEmpty) {
+                                                await vm.musicPlay(_musicKitPlugin, nextMusicItem);
+                                              }
                                             } else {
                                               // bad時の処理を行い、次の曲を流す
                                               result = await vm.swipeBad(musicItem, nextMusicItem);
-                                              await vm.musicPlay(_musicKitPlugin, nextMusicItem);
+                                              if (_userToken.isNotEmpty) {
+                                                await vm.musicPlay(_musicKitPlugin, nextMusicItem);
+                                              }
                                             }
                                             setState(() {
                                               swipingFlag = false;
@@ -364,7 +369,9 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                         });
                       });
                       if (_playerState == null || vm.isStop(_playerState!.playbackStatus)) {
-                        vm.musicPlay(_musicKitPlugin, ref.watch(currentMusicItemProvider));
+                        if (_userToken.isNotEmpty) {
+                          await vm.musicPlay(_musicKitPlugin, ref.watch(currentMusicItemProvider));
+                        }
                       } else {
                         vm.musicStop(_musicKitPlugin);
                       }

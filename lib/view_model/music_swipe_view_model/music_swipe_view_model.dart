@@ -23,6 +23,7 @@ class MusicSwipeViewModel {
 
   // 曲再生
   Future<void> musicPlay(MusicKit musicKit, MusicItem? musicItem) async {
+
     // 現在の曲を取得
     // MusicItem? bkItem = ref.read(currentMusicItemBKProvider);
     if (musicItem == null) {
