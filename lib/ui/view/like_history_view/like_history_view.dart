@@ -53,6 +53,9 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                 data: (genreListData) {
                   //ビルド完了後の処理
                   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                    if (genreListData.isEmpty){
+                      return;
+                    }
                     // 初期表示の場合
                     if (selectedLikeGenre == null || beforeSelectedLikeGenre == null) {
                       ref.watch(selectedLikeGenreProvider.notifier).state = genreListData[0];
@@ -76,9 +79,9 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: selectedLikeGenre?.id,
-                          items: genreListData
+                          items: genreListData.isNotEmpty ? genreListData
                               .map((genre) => DropdownMenuItem(value: genre.id, child: Center(child: Text(genre.attributes["name"]!))))
-                              .toList(),
+                              .toList() : [const DropdownMenuItem(child: Text(""))],
                           onChanged: (String? value) {
                             // ジャンルの選択処理
                             for (Genre genre in genreListData) {
