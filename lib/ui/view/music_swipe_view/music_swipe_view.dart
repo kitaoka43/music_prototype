@@ -98,19 +98,25 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
 
   Future<void> initPlatformState() async {
     final status = await _musicKitPlugin.authorizationStatus;
+    print(status);
+    final subs = _musicSubsciption.canPlayCatalogContent;
+    print(subs);
 
     final developerToken = await _musicKitPlugin.requestDeveloperToken();
-    final userToken = await _musicKitPlugin.requestUserToken(developerToken);
+    var userToken;
+    if (subs != null) {
+      userToken = await _musicKitPlugin.requestUserToken(developerToken);
+    }
 
     final countryCode = await _musicKitPlugin.currentCountryCode;
-    final subs = await _musicSubsciption.canPlayCatalogContent;
+    // final subs = _musicSubsciption.canPlayCatalogContent;
 
     if (!mounted) return;
 
     setState(() {
       _status = status;
       _developerToken = developerToken;
-      _userToken = userToken;
+      _userToken = userToken ?? "";
       // _countryCode = countryCode;
       _subsc = subs.toString();
     });
@@ -192,7 +198,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                   return Column(
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width / 1.5,
+                        width: width / 1.4,
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
@@ -203,8 +209,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                             child: DropdownButton<String>(
                               value: ref.watch(selectedGenreProvider)?.id,
                               items: genreListData
-                                  .map(
-                                      (genre) => DropdownMenuItem(value: genre.id, child: Center(child: Text(genre.attributes["name"]!))))
+                                  .map((genre) => DropdownMenuItem(value: genre.id, child: Center(child: Text(genre.attributes["name"]!))))
                                   .toList(),
                               onChanged: (String? value) {
                                 MusicKitApiArg newArg = arg.copyWith(genre: int.parse(value ?? "0"));
@@ -236,11 +241,11 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                               ), //エラー時
                           loading: () => Center(
                                   child: Column(
-                                children: const [
+                                children: [
                                   SizedBox(
-                                    height: 250,
+                                    height: height / 3.376,
                                   ),
-                                  CircularProgressIndicator(),
+                                  const CircularProgressIndicator(),
                                 ],
                               )), //読み込み時
                           data: (musicItemListData) {
@@ -270,7 +275,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                             });
 
                             return SizedBox(
-                              height: 650,
+                              height: height / 1.298,
                               child: Stack(
                                 children: [
                                   Positioned.fill(
@@ -345,8 +350,8 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 70,
-                  height: 70,
+                  width: width / 5.571,
+                  height: height / 12.057,
                   child: FloatingActionButton(
                     onPressed: () async {
                       setState(() {

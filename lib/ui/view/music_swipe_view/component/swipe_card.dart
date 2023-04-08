@@ -17,6 +17,10 @@ class SwipeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 画面の高さ・幅取得
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
     final theme = Theme.of(context);
     MusicItem? currentMusicItem = ref.watch(currentMusicItemProvider);
     double durationInSec = currentMusicItem == null ? 0 : currentMusicItem.durationInSec.toDouble() / 1000;
@@ -51,12 +55,12 @@ class SwipeCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 40,
+                SizedBox(
+                  height: height / 21.1,
                 ),
                 Container(
-                  height: 310,
-                  width: 310,
+                  height: height / 2.722,
+                  width: width / 1.258,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
                     image: DecorationImage(
@@ -79,7 +83,7 @@ class SwipeCard extends ConsumerWidget {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              height: 200,
+              height: height / 4.22,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
@@ -102,7 +106,7 @@ class SwipeCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: 220,
+                height: height / 3.836,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
@@ -113,11 +117,11 @@ class SwipeCard extends ConsumerWidget {
                   color: Color(0xb2d9d9d9),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 20),
+                  padding: EdgeInsets.only(top: height / 42.2),
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 50,
+                        height: height / 16.88,
                         child: musicItem.musicName.length <= 20
                             ? Text(
                                 musicItem.musicName,
@@ -137,11 +141,11 @@ class SwipeCard extends ConsumerWidget {
                                   fontWeight: FontWeight.w700,
                                 ),
                                 pauseAfterRound: const Duration(seconds: 2),
-                          startAfter: const Duration(seconds: 2),
-                        ),
+                                startAfter: const Duration(seconds: 2),
+                              ),
                       ),
-                      const SizedBox(
-                        height: 5,
+                      SizedBox(
+                        height: height / 168.8,
                       ),
                       FittedBox(
                         child: Text(
@@ -154,7 +158,9 @@ class SwipeCard extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 15,),
+                      SizedBox(
+                        height: height / 56.267,
+                      ),
                       Column(
                         children: [
                           Slider(
@@ -170,7 +176,7 @@ class SwipeCard extends ConsumerWidget {
                             inactiveColor: Colors.grey.shade500,
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            padding: EdgeInsets.symmetric(horizontal: width / 21.667),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

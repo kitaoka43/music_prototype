@@ -138,10 +138,10 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 120,),
+              SizedBox(height: height / 7.033,),
               Container(
-                height: 370,
-                width: 370,
+                height: height / 2.281,
+                width: width / 1.054,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
                   image: DecorationImage(
@@ -195,7 +195,7 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: 300,
+                    height: height / 2.8133,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
@@ -210,7 +210,7 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 50,
+                            height: height / 16.88,
                             child: currentMusic != null
                                 ? currentMusic.musicName.length <= 20
                                     ? FittedBox(
@@ -237,8 +237,8 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                       )
                                 : Container(),
                           ),
-                          const SizedBox(
-                            height: 5,
+                          SizedBox(
+                            height: height / 168.8,
                           ),
                           FittedBox(
                             child: Text(
@@ -287,8 +287,8 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                             children: [
                               // 前の曲を再生する
                               Container(
-                                height: 70,
-                                width: 70,
+                                height: width / 5.5714,
+                                width: width / 5.5714,
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
@@ -302,14 +302,14 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                   },
                                   child: Icon(
                                     Icons.skip_previous,
-                                    size: 70,
+                                    size: width / 5.5714,
                                     color: Colors.grey.shade100,
                                   ),
                                 ),
                               ),
                               // 再生する
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 30),
+                                padding: EdgeInsets.symmetric(horizontal: width / 13),
                                 child: GestureDetector(
                                   onTap: () async {
                                     setState(() {
@@ -331,8 +331,8 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                     });
                                   },
                                   child: SizedBox(
-                                    height: 70,
-                                    width: 70,
+                                    height: width / 5.5714,
+                                    width: width / 5.5714,
                                     child: Container(
                                       height: double.infinity,
                                       width: double.infinity,
@@ -349,7 +349,7 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                       ),
                                       child: Icon(
                                         _playerState == null || vm.isStop(_playerState!.playbackStatus) ? Icons.play_arrow : Icons.pause,
-                                        size: 40,
+                                        size: width / 5.5714,
                                         color: Colors.white,
                                       ),
                                     ),
@@ -358,8 +358,8 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                               ),
                               // 次の曲を再生する
                               Container(
-                                height: 70,
-                                width: 70,
+                                height: width / 5.5714,
+                                width: width / 5.5714,
                                 color: Colors.transparent,
                                 child: GestureDetector(
                                   onTap: () async {
@@ -373,7 +373,7 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                   },
                                   child: Icon(
                                     Icons.skip_next,
-                                    size: 70,
+                                    size: width / 5.5714,
                                     color: Colors.grey.shade100,
                                   ),
                                 ),

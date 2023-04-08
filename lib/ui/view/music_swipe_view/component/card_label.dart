@@ -38,11 +38,14 @@ class CardLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 画面の高さ・幅取得
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Container(
       alignment: alignment,
-      padding: const EdgeInsets.symmetric(
-        vertical: 36,
-        horizontal: 36,
+      padding: EdgeInsets.symmetric(
+        vertical: height / 23.444,
+        horizontal: width / 10.833,
       ),
       child: Transform.rotate(
         angle: angle,
@@ -50,7 +53,7 @@ class CardLabel extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: color,
-              width: 4,
+              width: width / 97.5,
             ),
             color: Colors.white,
             borderRadius: BorderRadius.circular(4),

@@ -26,6 +26,10 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
     final selectedLikeGenre = ref.watch(selectedLikeGenreProvider);
     final beforeSelectedLikeGenre = ref.watch(beforeSelectedLikeGenreProvider);
     AsyncValue<List<LikeMusic>> musicItemList = ref.watch(likeMusicItemListProvider);
+    // 画面の高さ・幅取得
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
     return WillPopScope(
       onWillPop: () async {
         MusicKit musicKit = MusicKit();
@@ -39,7 +43,7 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
           backgroundColor: Colors.transparent,
         ),
         body: SizedBox(
-          width: MediaQuery.of(context).size.width,
+          width: width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -57,7 +61,7 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                     }
                   });
                   return Container(
-                    width: MediaQuery.of(context).size.width / 1.5,
+                    width: width / 1.4,
                     decoration: BoxDecoration(
                         color: Colors.white, //background color of dropdown button
                         borderRadius: BorderRadius.circular(15), //border raiuds of dropdown button
@@ -68,7 +72,7 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                               blurRadius: 5) //blur radius of shadow
                         ]),
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 30, right: 30),
+                      padding: EdgeInsets.symmetric(horizontal: width / 13),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: selectedLikeGenre?.id,
@@ -94,8 +98,8 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                   );
                 },
               ),
-              const SizedBox(
-                height: 10,
+              SizedBox(
+                height: height / 84.4,
               ),
               musicItemList.when(
                   error: (err, _) => Text(err.toString()), //エラー時
@@ -105,7 +109,7 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                         ? Container()
                         : SingleChildScrollView(
                             child: SizedBox(
-                              height: 680,
+                              height: height / 1.2411,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
@@ -118,19 +122,19 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                                       Navigator.push(context, MaterialPageRoute(builder: (builder) => const MusicPlayingView()));
                                     },
                                     child: SizedBox(
-                                      height: 85,
+                                      height: height / 9.929,
                                       child: Column(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                                            padding: EdgeInsets.symmetric(horizontal: width / 19.5),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Row(
                                                   children: [
                                                     SizedBox(
-                                                      height: 70,
-                                                      width: 70,
+                                                      height: width / 5.5714,
+                                                      width: width / 5.5714,
                                                       child: DecoratedBox(
                                                         decoration: BoxDecoration(
                                                           borderRadius: BorderRadius.circular(14),
@@ -149,15 +153,15 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                                                       ),
                                                     ),
                                                     Padding(
-                                                      padding: const EdgeInsets.only(left: 20.0),
+                                                      padding: EdgeInsets.only(left: width / 19.5),
                                                       child: SizedBox(
-                                                        width: 210,
+                                                        width: width / 1.8571,
                                                         child: Column(
                                                           mainAxisAlignment: MainAxisAlignment.center,
                                                           crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
                                                             Padding(
-                                                              padding: const EdgeInsets.only(bottom: 8.0),
+                                                              padding: EdgeInsets.only(bottom: height / 105.5),
                                                               child: Text(
                                                                 likeMusicListData[index].musicName,
                                                                 style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 18),
@@ -198,8 +202,8 @@ class _LikeHistoryViewState extends ConsumerState<LikeHistoryView> with SingleTi
                                               ],
                                             ),
                                           ),
-                                          const SizedBox(
-                                            height: 7,
+                                          SizedBox(
+                                            height: height / 105.5,
                                           ),
                                           const Divider(
                                             height: 1,
