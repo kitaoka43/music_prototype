@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -98,9 +99,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
 
   Future<void> initPlatformState() async {
     final status = await _musicKitPlugin.authorizationStatus;
-    print(status);
     final subs = _musicSubsciption.canPlayCatalogContent;
-    print(subs);
 
     final developerToken = await _musicKitPlugin.requestDeveloperToken();
     String userToken;
@@ -109,6 +108,7 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
     } catch (e) {
       userToken = "";
     }
+
     final countryCode = await _musicKitPlugin.currentCountryCode;
     if (!mounted) return;
 
@@ -371,6 +371,21 @@ class _MusicSwipeViewState extends ConsumerState<MusicSwipeView> with SingleTick
                       if (_playerState == null || vm.isStop(_playerState!.playbackStatus)) {
                         if (_userToken.isNotEmpty) {
                           await vm.musicPlay(_musicKitPlugin, ref.watch(currentMusicItemProvider));
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return CupertinoAlertDialog(
+                                title: const Text("AppleMusicのメンバー以外は再生できません"),
+                                actions: <Widget>[
+                                  CupertinoDialogAction(
+                                    child: const Text("OK"),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         }
                       } else {
                         vm.musicStop(_musicKitPlugin);

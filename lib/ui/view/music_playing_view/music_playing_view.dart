@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:blur/blur.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:marquee/marquee.dart';
@@ -321,6 +322,20 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                 child: GestureDetector(
                                   onTap: () async {
                                     if (_userToken.isEmpty){
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return CupertinoAlertDialog(
+                                            title: const Text("AppleMusicのメンバー以外は再生できません"),
+                                            actions: <Widget>[
+                                              CupertinoDialogAction(
+                                                child: const Text("OK"),
+                                                onPressed: () => Navigator.pop(context),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
                                       return;
                                     }
                                     setState(() {
@@ -360,7 +375,7 @@ class _MusicPlayingViewState extends ConsumerState<MusicPlayingView> with Single
                                       ),
                                       child: Icon(
                                         _playerState == null || vm.isStop(_playerState!.playbackStatus) ? Icons.play_arrow : Icons.pause,
-                                        size: width / 5.5714,
+                                        size: width / 7,
                                         color: Colors.white,
                                       ),
                                     ),
